@@ -1,0 +1,21 @@
+<article id="eke0" class="item" itemscope itemtype="http://schema.org/Article">
+    <div class="image">
+      <img alt="<%= article.title %>" src="/uploads/assets/<%= article.imageName %>" />
+      <link itemprop="image" href="<%= article.siteUrl %>/uploads/assets/<%= article.imageName %>">
+    </div>
+    <div id="num0" class="item-text">
+      <h2 id="<%= article.titleId %>" itemprop="name"><%= article.title %></h2>
+      <hr>
+      <div itemprop="articleBody">
+        <%- article.article %>
+        <!--<p class="item-p">Foto’s: Zwaan Ipema</p>-->
+      </div>
+      <div class="item-date">
+        <time itemtype="dateCreated" datetime="<%= article.date %>"><%= article.dateString %></time>&ensp;
+        <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Feigenkunsteerst.org%2F2015%2FGoed%2Bverhaal.html"><i class="icon-facebook"></i></a>
+        <a href="https://twitter.com/intent/tweet?text=Ik+lees+net+het+artikel+%27Goed+verhaal%27+op+http%3A%2F%2Feigenkunsteerst.org%2F2015%2FGoed%2Bverhaal.html&url=http%3A%2F%2Feigenkunsteerst.org%2F2015%2FGoed%2Bverhaal.html&hashtags=eigenkunsteerst" title="Tweet het artikel '<%= article.title %>'"><i class="icon-twitter"></i></a>
+        <a href="mailto:?to=&amp;subject=<%= article.title %>&amp;body=Ik lees net het artikel '<%= article.title %>' op <%= article.permaLink %>"><i class="icon-mail"></i></a>
+      </div>
+      <meta itemprop="author" content="Vincent Bruijn">
+    </div>
+  </article>
