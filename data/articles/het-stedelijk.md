@@ -1,0 +1,7 @@
+---
+title: Het Stedelijk
+date: 2010-09-04 18:32:57
+image: vincent_bruijn_stedelijk_museum_amsterdam.jpg
+---
+
+Wat me nou een tof idee leek, maar waar ik het lef niet voor heb, is naar het Stedelijk te gaan met een spuitbus zwarte verf om dan in zo'n mooie lege witte maagdelijke prachtig verlichte toonzaal met hele grote letters op de muur te spuiten: "I am too happy not to tell you." Het Stedelijk is weer open! Laat het tot je doordringen: Het Stedelijk Is Weer Open. Ik ben dolblij, echt waar. Vrijdag 3 september 2010 is voor mij een soort Jaar Nul, of beter misschien een Renaissance: de dag waarop ik na jaren me weer kon laven aan wat ik het mooiste museum vind, met de mooiste collectie, de dag waar ik jaren naar uit heb gekeken, de dag waarop ik me realiseerde dat er een generatie kunstenaars is die het Stedelijk tijdens hun studie niet hebben gekend. Kunstenaars die niet aan den lijve hebben kunnen ondervinden wat de Beanery is, of hoe een schier eindeloze rij Malevich'en eruit zien, of om te weten waar de collectie van het Stedelijk min of meer uit bestaat: Piet Mondriaan, Paul Cézanne, Monet, Manet, Breitner, Malevich, van der Leck, Kirchner, Rietveld, Judd, de Toorops, Appel, Lichtenstein… (Als ik zo doorga denkt Google nog dat ik ze loop te vukken om aandacht te trekken…) Want echt, het Stedelijk heeft een enorm vette collectie. En die gaan we godzijdank vanaf nu weer zien…!
