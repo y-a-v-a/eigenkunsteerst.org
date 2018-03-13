@@ -13,6 +13,7 @@ const articleSrc = './data/articles';
 fse.emptyDirSync(destPath);
 
 fse.copySync('./layout/assets/', `${destPath}/`);
+fse.copySync('./data/images/', `${destPath}/images/`);
 
 fs.readdir(articleSrc, function(error, files) {
   files.forEach(function(file) {

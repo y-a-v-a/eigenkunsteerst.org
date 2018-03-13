@@ -1,0 +1,26 @@
+/* the humans responsible & colophon */
+/* humanstxt.org */
+
+/* TEAM */
+Design, Front-End & Development: Vincent Bruijn
+Site: http://www.vincentbruijn.nl/
+Location: Amsterdam / Netherlands
+
+
+/* SITE */
+Last update: 2013/05/08
+Standards: HTML5, CSS3, PHP5, JavaScript
+Components: Symfony 1, jQuery
+Software: Mac OSX, TextMate2 , FileZilla, GIT-SourceTree
+
+
+/*
+888  888         8888b.         888  888         8888b.       .d88b.  888d888  .d88b.  
+888  888            "88b        888  888            "88b     d88""88b 888P"   d88P"88b 
+888  888 888888 .d888888 888888 Y88  88P 888888 .d888888     888  888 888     888  888 
+Y88b 888        888  888         Y8bd8P         888  888 d8b Y88..88P 888     Y88b 888 
+ "Y88888        "Y888888          Y88P          "Y888888 Y8P  "Y88P"  888      "Y88888 
+     888                                                                           888 
+Y8b d88P                                                                      Y8b d88P 
+ "Y88P"                                                                        "Y88P"
+*/
