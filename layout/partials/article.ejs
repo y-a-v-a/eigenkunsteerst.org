@@ -1,21 +1,32 @@
-<article id="eke0" class="item" itemscope itemtype="http://schema.org/Article">
-    <div class="image">
-      <img alt="<%= article.title %>" src="/images/<%= article.imageName %>" />
-      <link itemprop="image" href="<%= article.siteUrl %>/images/<%= article.imageName %>">
+<article id="eke<%= article.index %>" class="item" itemscope itemtype="http://schema.org/Article">
+  <div class="image">
+    <% if (article.isSingle || article.index === 0) { %>
+      <img class="article-image" alt="<%= article.title %>" src="/uploads/assets/<%= article.image %>" />
+    <% } else { %>
+      <img class="article-image sub" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OTEiIGhlaWdodD0iNDAwIiB2aWV3Qm94PSIwIDAgMSAxIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIj48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iNDkxIiBoZWlnaHQ9IjQwMCIgZmlsbD0icmdiKDE5MSwxOTEsMTkxKSIvPjwvc3ZnPg==" alt="<%= article.title %>" data-original="/uploads/assets/<%= article.image %>">
+    <% } %>
+    <link itemprop="image" href="<%= article.baseUrl %>/uploads/assets/<%= article.image %>">
+  </div>
+  <div id="num<%= article.index %>%>" class="item-text">
+    <h2 id="<%= article.titleId %>" itemprop="name">
+      <% if (!article.isSingle) { %>
+        <a href="<%= article.permaLink %>" itemprop="url"><%= article.title %></a>
+      <% } else { %>
+        <%= article.title %>
+      <% } %>
+    </h2>
+    <hr>
+    <div itemprop="articleBody">
+      <%- article.content.replace(/\<p\>/g, '<p class="item-p">') %>
     </div>
-    <div id="num0" class="item-text">
-      <h2 id="<%= article.titleId %>" itemprop="name"><%= article.title %></h2>
-      <hr>
-      <div itemprop="articleBody">
-        <%- article.article %>
-        <!--<p class="item-p">Foto’s: Zwaan Ipema</p>-->
-      </div>
-      <div class="item-date">
-        <time itemtype="dateCreated" datetime="<%= article.date %>"><%= article.dateString %></time>&ensp;
-        <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Feigenkunsteerst.org%2F2015%2FGoed%2Bverhaal.html"><i class="icon-facebook"></i></a>
-        <a href="https://twitter.com/intent/tweet?text=Ik+lees+net+het+artikel+%27Goed+verhaal%27+op+http%3A%2F%2Feigenkunsteerst.org%2F2015%2FGoed%2Bverhaal.html&url=http%3A%2F%2Feigenkunsteerst.org%2F2015%2FGoed%2Bverhaal.html&hashtags=eigenkunsteerst" title="Tweet het artikel '<%= article.title %>'"><i class="icon-twitter"></i></a>
-        <a href="mailto:?to=&amp;subject=<%= article.title %>&amp;body=Ik lees net het artikel '<%= article.title %>' op <%= article.permaLink %>"><i class="icon-mail"></i></a>
-      </div>
-      <meta itemprop="author" content="Vincent Bruijn">
+    <div class="item-date">
+      <time itemtype="dateCreated" datetime="<%= article.date %>"><%= article.dateString %></time>&ensp;
+      <a href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent(article.permaLink) %>"><i class="icon-facebook"></i></a>
+
+      <a href="https://twitter.com/intent/tweet?text=<%= encodeURIComponent(`Ik lees net het artikel '${article.title}' op ${article.permaLink}`) %>&amp;url=<%= encodeURIComponent(article.permaLink) %>&amp;hashtags=eigenkunsteerst" title="Tweet het artikel '<%= article.title %>'"><i class="icon-twitter"></i></a>
+
+      <a href="mailto:?to=&amp;subject=<%= article.title %>&amp;body=Ik lees net het artikel '<%= article.title %>' op <%= article.permaLink %>"><i class="icon-mail"></i></a>
     </div>
-  </article>
+    <meta itemprop="author" content="Vincent Bruijn">
+  </div>
+</article>

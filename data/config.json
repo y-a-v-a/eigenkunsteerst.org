@@ -1,4 +1,10 @@
 {
   "baseUrl": "http://www.eigenkunsteerst.org",
-  "siteTitle": "Eigen kunst eerst"
+  "rssTitle": "Eigen Kunst Eerst! | Blog",
+  "siteTitle": "Eigen kunst eerst",
+  "titleSuffix": " &bull; Eigen Kunst Eerst! &bull; Blog",
+  "description": "Eigen Kunst Eerst! | Blog van Vincent Bruijn",
+  "language": "nl-NL",
+  "copyright": "copyleft Vincent Bruijn",
+  "license": "http://creativecommons.org/licenses/by-nc-sa/3.0/"
 }

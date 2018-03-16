@@ -1,6 +1,6 @@
 <head>
   <meta charset="utf-8">
-  <title><%= article.title %> &bull; Eigen Kunst Eerst! &bull; Blog</title>
+  <title><%- article ? article.pageTitle : site.title %></title>
   <meta name="verify-v1" content="/Bq2j7dlSVVrqjJ3jwiJ10/pOhNXtWMHmG+w6tIMAcs=">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -12,25 +12,14 @@
   <link rel="dns-prefetch" href="//ajax.googleapis.com">
 
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta name="title" content="<%= article.title %> &bull; Eigen Kunst Eerst! &bull; Blog" />
+  <meta name="title" content="<%- article ? article.pageTitle : site.title %>" />
   <meta name="robots" content="index, follow" />
   <meta name="description" content="Kunstblog - Artikelen in dit blog gaan over beeldende kunst, hedendaagse kunst, moderne kunst, kijken en cultuur. Kunst en kijken vormen de basis voor recensies en beschouwingen." />
   <meta name="keywords" content="eigen kunst eerst, kunstblog, art blog, art blog amsterdam, exhibition reviews amsterdam, kunstblog amsterdam, Vincent Bruijn, kunst blog, beeldende kunst blog, recensie blog, kunstrecensie blog" />
   <meta name="language" content="nl" />
-  <link rel="alternate" type="application/rss+xml" title="Eigen Kunst Eerst! &bull; RSS" href="http://eigenkunsteerst.org/feeds/rss" />
+  <link rel="alternate" type="application/rss+xml" title="Eigen Kunst Eerst! &bull; RSS" href="<%= site.baseUrl %>/feeds/rss" />
 
-  <meta property="og:site_name" content="Eigen Kunst Eerst"/>
-    <meta property="og:locale" content="nl_NL" />
-  <meta property="article:author" content="https://www.facebook.com/vebruijn" />
-
-  <meta property="og:title" content="<%= article.title %>" />
-
-  <meta property="og:type" content="article"/>
-
-  <meta property="og:url" content="http://eigenkunsteerst.org/2015/Goed+verhaal.html"/>
-
-  <meta property="og:image" content="http://eigenkunsteerst.org/uploads/assets/vincent_bruijn_ax710_malevich_henk_schiffmacher.jpg"/>
-  <meta property="og:description" content="Kunstblog - Artikelen in dit blog gaan over beeldende kunst, hedendaagse kunst, moderne kunst, kijken en cultuur. Kunst en kijken vormen de basis voor recensies en beschouwingen."/>
+  <%- include('og') %>
 
   <link rel="apple-touch-icon-precomposed" sizes="144x144" href="images/apple-touch-icon-144x144-precomposed.png">
   <link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/apple-touch-icon-114x114-precomposed.png">
@@ -43,21 +32,11 @@
   <link href="http://fonts.googleapis.com/css?family=Montserrat:700|Open+Sans" rel="stylesheet" type="text/css">
 
   <link href="/css/main.css" rel="stylesheet" type="text/css" media="screen">
-  <script>
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-16179947-3']);
-  _gaq.push(['_trackPageview']);
 
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-  </script>
-
+  <%- include('ua') %>
 
   <meta itemprop="author" content="Vincent Bruijn">
   <meta itemprop="name" content="Eigen Kunst Eerst">
   <meta itemprop="inLanguage" content="nl-NL">
-  <link itemprop="url" href="http://www.eigenkunsteerst.org">
+  <link itemprop="url" href="<%= site.baseUrl %>">
 </head>

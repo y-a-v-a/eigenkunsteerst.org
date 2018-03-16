@@ -9,17 +9,46 @@ const config = require('./data/config');
 
 const destPath = './build';
 const articleSrc = './data/articles';
+const images = {
+  src: './data/images/',
+  dest: `${destPath}/uploads/assets/`
+};
+
+const assets = {
+  src: './layout/assets/',
+  dest: `${destPath}/`
+}
+
+const data = {
+  currentYear: new Date().getUTCFullYear(),
+  site: {
+    baseUrl: config.baseUrl,
+    title: config.title,
+    navigationItems: [],
+    image: ''
+  },
+  channel: {
+    title: config.rssTitle,
+    baseUrl: config.baseUrl,
+    description: config.description,
+    language: config.language,
+    copyright: config.copyright,
+    lastBuildDate: (new Date()).toString(),
+    license: config.license
+  }
+};
 
 fse.emptyDirSync(destPath);
 
-fse.copySync('./layout/assets/', `${destPath}/`);
-fse.copySync('./data/images/', `${destPath}/images/`);
+fse.copySync(images.src, images.dest);
+fse.copySync(assets.src, assets.dest);
+fse.mkdirsSync(`${destPath}/feeds`);
 
 fs.readdir(articleSrc, function(error, yearDirs) {
   if (error) {
     throw error;
   }
-  yearDirs.forEach(function(yearDir) {
+  yearDirs.forEach(function(yearDir, index, list) {
     const articleSrcYearDir = `${articleSrc}/${yearDir}`;
     if (!/[0-9]{4}/.test(articleSrcYearDir)) {
       return;
@@ -28,11 +57,10 @@ fs.readdir(articleSrc, function(error, yearDirs) {
     const yearCollection = [];
 
     fs.readdir(articleSrcYearDir, function(error, files) {
-      console.log(files.length);
       if (error) {
         throw error;
       }
-      files.forEach(function(file) {
+      files.forEach(function(file, index) {
 
         const articleFileMd = `${articleSrcYearDir}/${file}`;
 
@@ -41,22 +69,33 @@ fs.readdir(articleSrc, function(error, yearDirs) {
         const pageData = frontMatter(articleMd);
         const rendered = marked(pageData.body);
 
-        const ejsData = {
+        const ejsArticleData = {
           article: {
-            article: rendered,
+            index,
+            isSingle: true,
             title: pageData.attributes.title,
-            imageName: pageData.attributes.image,
+            pageTitle: `${pageData.attributes.title} ${config.titleSuffix}`,
+            image: pageData.attributes.image,
+            imageName: pageData.attributes.image.replace(/\..*$/, ''),
+            baseUrl: data.site.baseUrl,
+            titleId: `${pageData.attributes.title}`.replace(/\s+/g, '_'),
+            permaLink: `${data.site.baseUrl}/${yearDir}/${file.replace('.md', '.html')}`,
+            content: rendered,
             date: pageData.attributes.date,
-            dateString: pageData.attributes.date.toLocaleString()
+            dateString: pageData.attributes.date.toLocaleString(),
           }
         };
+        yearCollection.push(ejsArticleData);
 
-        ejs.renderFile('./layout/partials/article.ejs', ejsData, {}, function(error, resultHTML) {
-          const pageData = Object.assign({}, ejsData);
-          pageData.body = resultHTML;
-          yearCollection.push(resultHTML);
+        ejs.renderFile('./layout/partials/article.ejs', ejsArticleData, {}, function(error, resultHTML) {
+          const ejsPageData = Object.assign({}, data);
+          ejsPageData.body = resultHTML;
+          ejsPageData.article = ejsArticleData.article;
 
-          ejs.renderFile('./layout/master.ejs', pageData, {}, function(error, pageHTML) {
+          ejs.renderFile('./layout/master.ejs', ejsPageData, {}, function(error, pageHTML) {
+            if (error) {
+              throw error;
+            }
             fse.mkdirsSync(`${destPath}/${yearDir}`);
             fs.writeFileSync(`${destPath}/${yearDir}/${file.replace('md', 'html')}`, pageHTML);
 
@@ -65,23 +104,20 @@ fs.readdir(articleSrc, function(error, yearDirs) {
         });
       });
 
-      console.log(yearCollection.length);
-
       if (yearCollection.length) {
-        let pageData = {
+        let ejsPageData = {
           article: {
             title: yearDir
           },
           body: yearCollection.join('\n')
         };
 
-        ejs.renderFile('./layout/master.ejs', pageData, {}, function(error, pageHTML) {
+        ejs.renderFile('./layout/master.ejs', ejsPageData, {}, function(error, pageHTML) {
           fs.writeFileSync(`${destPath}/${yearDir}.html`, pageHTML);
 
           console.log(`Wrote HTML for ${yearDir}`);
         });
       }
-
     });
   });
 });

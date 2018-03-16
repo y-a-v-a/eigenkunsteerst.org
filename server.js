@@ -7,7 +7,7 @@ const    port = process.argv[2] || 3000;
 http.createServer(function(request, response) {
 
   const uri = url.parse(request.url).pathname;
-  let filename = path.join(process.cwd(), uri);
+  let filename = path.join(`${process.cwd()}/build`, uri);
 
   fs.exists(filename, function(exists) {
     if(!exists) {
@@ -18,6 +18,8 @@ http.createServer(function(request, response) {
     }
 
     if (fs.statSync(filename).isDirectory()) filename += '/index.html';
+
+    console.log(filename);
 
     fs.readFile(filename, 'binary', function(err, file) {
       if(err) {
