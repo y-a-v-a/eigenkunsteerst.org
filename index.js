@@ -46,17 +46,20 @@ fse.copySync(images.src, images.dest);
 fse.copySync(assets.src, assets.dest);
 fse.mkdirsSync(`${destPath}/feeds`);
 
-const navigationItems = [];
-
+// read article data dir
 fs.readdir(articleSrc, function(error, yearDirs) {
   if (error) {
     throw error;
   }
+  const navigationItems = [];
+
+  // filter out non-4-digit directories like .DS_Store etc
   yearDirs = yearDirs.filter((year) => {
     return /^[0-9]{4}$/.test(year);
   });
 
-  yearDirs.sort().reverse().forEach(function(year, index, list) {
+  // create basic nav data
+  yearDirs.sort().reverse().forEach(function(year) {
     navigationItems.push({
       url: `/${year}.html`,
       name: `${year}`,
@@ -64,14 +67,13 @@ fs.readdir(articleSrc, function(error, yearDirs) {
     });
   });
 
+  // cache most recent year for index.html
   mostRecentYear = yearDirs[0];
+  const rssItems = [];
+  let isRssBuilt = false;
 
-  yearDirs.forEach(function(yearDir, index, list) {
+  yearDirs.forEach(function(yearDir, yearIndex) {
     const articleSrcYearDir = `${articleSrc}/${yearDir}`;
-    if (!/[0-9]{4}/.test(articleSrcYearDir)) {
-      return;
-    }
-
     const yearCollection = [];
 
     fs.readdir(articleSrcYearDir, function(error, files) {
@@ -79,12 +81,13 @@ fs.readdir(articleSrc, function(error, yearDirs) {
         throw error;
       }
 
-      data.site.navigationItems = [...navigationItems].map((year) => {
-        year.active = false;
-        if (year.name == yearDir) {
-          year.active = true;
-        }
-        return year;
+      console.log('Prepare navigation');
+      data.site.navigationItems = navigationItems.map((year) => {
+        return {
+          url: year.url,
+          name: year.name,
+          active: year.name == yearDir
+        };
       });
 
       files.forEach(function(file, index) {
@@ -109,9 +112,19 @@ fs.readdir(articleSrc, function(error, yearDirs) {
             permaLink: `${data.site.baseUrl}/${yearDir}/${file.replace('.md', '.html')}`,
             content: rendered,
             date: pageData.attributes.date,
+            pubDate: pageData.attributes.date,
             dateString: pageData.attributes.date.toLocaleString(),
+            license: data.channel.license
           }
         };
+
+        if (rssItems.length < 5) {
+          rssItems.push(ejsArticleData);
+        }
+        if (rssItems.length === 5 && !isRssBuilt) {
+          renderRssFeed(rssItems);
+          isRssBuilt = true;
+        }
 
         ejs.renderFile('./layout/partials/article.ejs', ejsArticleData, {}, function(error, resultHTML) {
           if (error) {
@@ -120,6 +133,7 @@ fs.readdir(articleSrc, function(error, yearDirs) {
           const ejsPageData = Object.assign({}, data);
           ejsPageData.body = resultHTML;
           ejsPageData.article = ejsArticleData.article;
+          console.log('Rendered article for permaLink');
 
           ejs.renderFile('./layout/master.ejs', ejsPageData, {}, function(error, pageHTML) {
             if (error) {
@@ -140,6 +154,7 @@ fs.readdir(articleSrc, function(error, yearDirs) {
           }
 
           yearCollection.push(resultHTML);
+          console.log('Rendered article for year archive');
         });
       });
 
@@ -166,3 +181,39 @@ fs.readdir(articleSrc, function(error, yearDirs) {
     });
   });
 });
+
+
+function renderRssFeed(rssItems) {
+  const rssItemsHTML = [];
+
+  rssItems.sort((a, b) => {
+    return a.article.date > b.article.date ? -1 : (a.article.date < b.article.data ? 1 : 0);
+  }).forEach((rssItemData) => {
+    rssItemData.article.content = rssItemData.article.content.replace(/<p>/g, '').replace(/<\/p>/g, '<br>');
+    ejs.renderFile('./layout/rss/item.ejs', rssItemData, {}, function(error, resultXML) {
+      if (error) {
+        throw error;
+      }
+      rssItemsHTML.push(resultXML);
+      console.log('Rendered RSS item');
+    });
+  });
+
+  ejsChannelData = Object.assign({}, data);
+  ejsChannelData.articles = rssItemsHTML.join('');
+  ejs.renderFile('./layout/rss/channel.ejs', ejsChannelData, {}, function(error, resultXML) {
+    if (error) {
+      throw error;
+    }
+    console.log('Rendered RSS channel');
+
+    ejs.renderFile('./layout/rss.ejs', { content: resultXML }, {}, (error, resultXML) => {
+      if (error) {
+        throw error;
+      }
+      fs.writeFileSync(`${destPath}/feeds/rss`, resultXML);
+
+      console.log(`Wrote XML for feed/rss`);
+    });
+  });
+}

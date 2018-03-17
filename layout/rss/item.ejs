@@ -1,15 +1,15 @@
 <item>
   <title><%= article.title %></title>
-  <link><%= article.permalink %></link>
+  <link><%= article.permaLink %></link>
   <dc:creator>Vincent Bruijn</dc:creator>
   <description>
     <![CDATA[
-      <%= article.content %>
+      <%- article.content %>
       <br/><br/>
       <img src="http://www.eigenkunsteerst.org/uploads/assets/<%= article.image %>" alt="<%= article.imageName %>" />
       <br /><br /><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://creativecommons.org/images/public/somerights20.png" /></a>
     ]]></description>
-  <pubDate><%= article.pubdate %></pubDate>
-  <guid isPermaLink="false"><%= article.permalink %></guid>
+  <pubDate><%= article.pubDate %></pubDate>
+  <guid isPermaLink="false"><%= article.permaLink %></guid>
   <creativeCommons:license><%= article.license %></creativeCommons:license>
 </item>
