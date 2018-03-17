@@ -7,6 +7,8 @@ const frontMatter = require('front-matter');
 
 const config = require('./data/config');
 
+config.baseUrl = 'http://localhost:3000';
+
 const destPath = './build';
 const articleSrc = './data/articles';
 const images = {
@@ -44,10 +46,26 @@ fse.copySync(images.src, images.dest);
 fse.copySync(assets.src, assets.dest);
 fse.mkdirsSync(`${destPath}/feeds`);
 
+const navigationItems = [];
+
 fs.readdir(articleSrc, function(error, yearDirs) {
   if (error) {
     throw error;
   }
+  yearDirs = yearDirs.filter((year) => {
+    return /^[0-9]{4}$/.test(year);
+  });
+
+  yearDirs.sort().reverse().forEach(function(year, index, list) {
+    navigationItems.push({
+      url: `/${year}.html`,
+      name: `${year}`,
+      active: false
+    });
+  });
+
+  mostRecentYear = yearDirs[0];
+
   yearDirs.forEach(function(yearDir, index, list) {
     const articleSrcYearDir = `${articleSrc}/${yearDir}`;
     if (!/[0-9]{4}/.test(articleSrcYearDir)) {
@@ -60,6 +78,15 @@ fs.readdir(articleSrc, function(error, yearDirs) {
       if (error) {
         throw error;
       }
+
+      data.site.navigationItems = [...navigationItems].map((year) => {
+        year.active = false;
+        if (year.name == yearDir) {
+          year.active = true;
+        }
+        return year;
+      });
+
       files.forEach(function(file, index) {
 
         const articleFileMd = `${articleSrcYearDir}/${file}`;
@@ -85,9 +112,11 @@ fs.readdir(articleSrc, function(error, yearDirs) {
             dateString: pageData.attributes.date.toLocaleString(),
           }
         };
-        yearCollection.push(ejsArticleData);
 
         ejs.renderFile('./layout/partials/article.ejs', ejsArticleData, {}, function(error, resultHTML) {
+          if (error) {
+            throw error;
+          }
           const ejsPageData = Object.assign({}, data);
           ejsPageData.body = resultHTML;
           ejsPageData.article = ejsArticleData.article;
@@ -102,18 +131,34 @@ fs.readdir(articleSrc, function(error, yearDirs) {
             console.log(`Wrote HTML for ${file}`);
           });
         });
+
+        ejsArticleData.article.isSingle = false;
+
+        ejs.renderFile('./layout/partials/article.ejs', ejsArticleData, {}, function(error, resultHTML) {
+          if (error) {
+            throw error;
+          }
+
+          yearCollection.push(resultHTML);
+        });
       });
 
       if (yearCollection.length) {
-        let ejsPageData = {
-          article: {
-            title: yearDir
-          },
-          body: yearCollection.join('\n')
-        };
+        let ejsPageData = Object.assign({}, data);
+        ejsPageData.body = yearCollection.join('\n');
+        ejsPageData.article = {};
 
         ejs.renderFile('./layout/master.ejs', ejsPageData, {}, function(error, pageHTML) {
+          if (error) {
+            throw error;
+          }
+
           fs.writeFileSync(`${destPath}/${yearDir}.html`, pageHTML);
+          if (mostRecentYear === yearDir) {
+            fs.writeFileSync(`${destPath}/index.html`, pageHTML);
+
+            console.log(`Wrote HTML for index.html`);
+          }
 
           console.log(`Wrote HTML for ${yearDir}`);
         });

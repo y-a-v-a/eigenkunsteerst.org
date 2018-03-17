@@ -1,6 +1,10 @@
 <head>
   <meta charset="utf-8">
-  <title><%- article ? article.pageTitle : site.title %></title>
+  <% if(article) { %>
+    <title><%- site.title %></title>
+  <% } else { %>
+    <title><%- article.pageTitle %></title>
+  <% } %>
   <meta name="verify-v1" content="/Bq2j7dlSVVrqjJ3jwiJ10/pOhNXtWMHmG+w6tIMAcs=">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -12,7 +16,11 @@
   <link rel="dns-prefetch" href="//ajax.googleapis.com">
 
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta name="title" content="<%- article ? article.pageTitle : site.title %>" />
+  <% if(article) { %>
+    <meta name="title" content="<%- article.pageTitle %>" />
+  <% } else { %>
+    <meta name="title" content="<%- site.title %>" />
+  <% } %>
   <meta name="robots" content="index, follow" />
   <meta name="description" content="Kunstblog - Artikelen in dit blog gaan over beeldende kunst, hedendaagse kunst, moderne kunst, kijken en cultuur. Kunst en kijken vormen de basis voor recensies en beschouwingen." />
   <meta name="keywords" content="eigen kunst eerst, kunstblog, art blog, art blog amsterdam, exhibition reviews amsterdam, kunstblog amsterdam, Vincent Bruijn, kunst blog, beeldende kunst blog, recensie blog, kunstrecensie blog" />

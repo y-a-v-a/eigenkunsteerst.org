@@ -1,7 +1,7 @@
 <nav id="nav">
   <h3>
     <% site.navigationItems.forEach(function(item) { %>
-      <a href="<%= item.url %>" id="prev"><%= item.name %></a>
+      <a href="<%= item.url %>" id="prev" class="<%= item.active ? 'is-active' : '' %>"><%= item.name %></a>
     <% }); %>
   </h3>
 </nav>

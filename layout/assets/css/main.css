@@ -208,6 +208,10 @@ footer {
     text-align: center;
 }
 
+#nav .is-active {
+  text-decoration: underline;
+}
+
 .image {
     float: left;
     width: 491px;
@@ -457,3 +461,4 @@ footer {
 .rss:hover {
   color: #333;
 }
+
