@@ -6,7 +6,8 @@ const connection = mysql.createConnection({
   user: 'root',
   password: '',
   database: 'blog',
-  socketPath: '/opt/local/var/run/mysql55/mysqld.sock'
+  socketPath: '/opt/local/var/run/mysql55/mysqld.sock',
+  charset: 'LATIN1_GENERAL_CI'
 });
 
 const articleDest = './data/articles';
@@ -41,5 +42,5 @@ ${result.content}
 connection.end();
 
 function sanitizeTitle(title) {
-  return title.toLowerCase().replace(/ /g, '-').replace(/[\?\'\,\.ç\!]/g, '').replace(/\-+/g, '-');
+  return title.toLowerCase().replace(/ /g, '-').replace(/[\?\'\,\.\!]/g, '').replace(/\-+/g, '-').replace('ç', 'c');
 }

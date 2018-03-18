@@ -11,6 +11,8 @@ https://medium.com/douglas-matoso-english/build-static-site-generator-nodejs-896
 ## To do
 
 * fix anchors in content
+* return of `<title>`s in pages
+* change date output
 
 ## License
 
