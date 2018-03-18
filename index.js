@@ -113,7 +113,7 @@ fs.readdir(articleSrc, function(error, yearDirs) {
             content: rendered,
             date: pageData.attributes.date,
             pubDate: pageData.attributes.date,
-            dateString: pageData.attributes.date.toLocaleString(),
+            dateString: (new Date(pageData.attributes.date)).toLocaleString('nl-NL',  { timeZone: 'Europe/Amsterdam' }),
             license: data.channel.license
           }
         };
