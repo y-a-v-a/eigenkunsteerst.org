@@ -10,9 +10,7 @@ https://medium.com/douglas-matoso-english/build-static-site-generator-nodejs-896
 
 ## To do
 
-* Render overview pages
-* Render proper navigation
-* rss should only contain last 5 articles
+* fix anchors in content
 
 ## License
 
