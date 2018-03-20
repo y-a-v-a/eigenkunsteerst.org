@@ -31,7 +31,7 @@ date: ${result.created_at}
 ${result.content}
 `;
     const year = (new Date(result.created_at)).getFullYear();
-    const fileName = sanitizeTitle(result.title);
+    const fileName = result.title;
 
     fs.writeFileSync(`${articleDest}/${year}/${fileName}.md`, template);
 
@@ -40,7 +40,3 @@ ${result.content}
 });
 
 connection.end();
-
-function sanitizeTitle(title) {
-  return title.toLowerCase().replace(/ /g, '-').replace(/[\?\'\,\.\!]/g, '').replace(/\-+/g, '-').replace('ç', 'c');
-}

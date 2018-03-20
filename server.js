@@ -1,8 +1,8 @@
 const http = require('http');
-const    url = require('url');
-const    path = require('path');
-const    fs = require('fs');
-const    port = process.argv[2] || 3000;
+const url = require('url');
+const path = require('path');
+const fs = require('fs');
+const port = process.argv[2] || 3000;
 
 http.createServer(function(request, response) {
 

@@ -74,7 +74,7 @@ fs.readdir(articleSrc, function(error, yearDirs) {
 
   yearDirs.forEach(function(yearDir, yearIndex) {
     const articleSrcYearDir = `${articleSrc}/${yearDir}`;
-    const yearCollection = [];
+    let yearCollection = [];
 
     fs.readdir(articleSrcYearDir, function(error, files) {
       if (error) {
@@ -99,6 +99,8 @@ fs.readdir(articleSrc, function(error, yearDirs) {
         const pageData = frontMatter(articleMd);
         const rendered = marked(pageData.body);
 
+        const fileName = encodeURIComponent(file).replace(/\%20/g, '+').replace('md', 'html');
+
         const ejsArticleData = {
           article: {
             index,
@@ -109,11 +111,11 @@ fs.readdir(articleSrc, function(error, yearDirs) {
             imageName: pageData.attributes.image.replace(/\..*$/, ''),
             baseUrl: data.site.baseUrl,
             titleId: `${pageData.attributes.title}`.replace(/\s+/g, '_'),
-            permaLink: `${data.site.baseUrl}/${yearDir}/${file.replace('.md', '.html')}`,
+            permaLink: `${data.site.baseUrl}/${yearDir}/${fileName}`,
             content: rendered,
             date: pageData.attributes.date,
             pubDate: pageData.attributes.date,
-            dateString: (new Date(pageData.attributes.date)).toLocaleString('nl-NL',  { timeZone: 'Europe/Amsterdam' }),
+            dateString: (new Date(pageData.attributes.date)).toLocaleString('en-US',  { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
             license: data.channel.license
           }
         };
@@ -140,7 +142,7 @@ fs.readdir(articleSrc, function(error, yearDirs) {
               throw error;
             }
             fse.mkdirsSync(`${destPath}/${yearDir}`);
-            fs.writeFileSync(`${destPath}/${yearDir}/${file.replace('md', 'html')}`, pageHTML);
+            fs.writeFileSync(`${destPath}/${yearDir}/${fileName}`, pageHTML);
 
             console.log(`Wrote HTML for ${file}`);
           });
@@ -153,14 +155,20 @@ fs.readdir(articleSrc, function(error, yearDirs) {
             throw error;
           }
 
-          yearCollection.push(resultHTML);
+          yearCollection.push([ejsArticleData.article.date, resultHTML]);
           console.log('Rendered article for year archive');
         });
       });
 
       if (yearCollection.length) {
         let ejsPageData = Object.assign({}, data);
-        ejsPageData.body = yearCollection.join('\n');
+        yearCollection = yearCollection.sort((a,b) => {
+          let dateA = new Date(a[0]);
+          let dateB = new Date(b[0]);
+          return dateA > dateB ? 1 : dateA < dateB ? -1 : 0;
+        }).reverse();
+
+        ejsPageData.body = yearCollection.map(el => el[1]).join('\n');
         ejsPageData.article = {};
 
         ejs.renderFile('./layout/master.ejs', ejsPageData, {}, function(error, pageHTML) {
