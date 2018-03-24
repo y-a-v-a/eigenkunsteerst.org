@@ -95,7 +95,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
         return {
           URL,
           name,
-          active: year.name == yearDir
+          active: year.name === yearDir
         };
       });
 
