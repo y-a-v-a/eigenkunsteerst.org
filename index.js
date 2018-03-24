@@ -6,13 +6,14 @@ const ejs = require('ejs');
 const fse = require('fs-extra');
 const marked = require('marked');
 const frontMatter = require('front-matter');
+const config = require('./data/config');
 
 const fsWriteCallback = msg => error => {
   if (error) throw error;
   debug(msg);
 };
 
-const config = require('./data/config');
+const DATE_FORMATTER = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
 config.baseUrl = 'http://localhost:3000';
 
@@ -32,7 +33,7 @@ const data = {
   currentYear: new Date().getUTCFullYear(),
   site: {
     baseUrl: config.baseUrl,
-    title: config.title,
+    title: config.siteTitle,
     navigationItems: [],
     image: ''
   },
@@ -106,7 +107,6 @@ fs.readdir(articleSrc, (error, yearDirs) => {
         const rendered = marked(pageData.body);
 
         const fileName = encodeURIComponent(file).replace(/\%20/g, '+').replace('md', 'html');
-        const dateFormatter = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
         const ejsArticleData = {
           article: {
@@ -122,7 +122,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
             content: rendered,
             date: pageData.attributes.date,
             pubDate: pageData.attributes.date,
-            dateString: (new Date(pageData.attributes.date)).toLocaleString('en-US',  dateFormatter),
+            dateString: (new Date(pageData.attributes.date)).toLocaleString('en-US',  DATE_FORMATTER),
             license: data.channel.license
           }
         };
@@ -150,7 +150,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
             const yearDirName = `${destPath}/${yearDir}`;
 
             fse.mkdirsSync(yearDirName);
-            fs.writeFile(`${yearDirName}/${fileName}`, pageHTML, fsWriteCallback(`Wrote HTML for ${file}`));
+            fs.writeFile(path.join(yearDirName, fileName), pageHTML, fsWriteCallback(`Wrote HTML for ${file}`));
           });
         });
 
@@ -159,7 +159,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
         ejs.renderFile('./layout/partials/article.ejs', ejsArticleData, {}, (error, resultHTML) => {
           if (error) throw error;
 
-          yearCollection.push([ejsArticleData.article.date, resultHTML]);
+          yearCollection.push([ejsArticleData.article.date, resultHTML, ejsArticleData.article.image]);
           debug('Rendered article for year archive');
         });
       });
@@ -173,14 +173,17 @@ fs.readdir(articleSrc, (error, yearDirs) => {
         }).reverse();
 
         ejsPageData.body = yearCollection.map(el => el[1]).join('\n');
-        ejsPageData.article = {};
+        ejsPageData.article = false;
+        let [[ , , firstImage]] = yearCollection;
+        ejsPageData.site.image = firstImage;
 
         ejs.renderFile('./layout/master.ejs', ejsPageData, {}, (error, pageHTML) => {
           if (error) throw error;
 
-          fs.writeFile(`${destPath}/${yearDir}.html`, pageHTML, fsWriteCallback(`Wrote HTML for ${yearDir}`));
+          fs.writeFile(path.join(destPath, `${yearDir}.html`), pageHTML,
+            fsWriteCallback(`Wrote HTML for ${yearDir}`));
           if (mostRecentYear === yearDir) {
-            const fileName = `${destPath}/index.html`;
+            const fileName = path.join(destPath, 'index.html');
 
             fs.writeFile(fileName, pageHTML, fsWriteCallback(`Wrote HTML for index.html`));
           }
@@ -189,7 +192,6 @@ fs.readdir(articleSrc, (error, yearDirs) => {
     });
   });
 });
-
 
 function renderRssFeed(rssItems, data) {
   const rssItemsHTML = [];
@@ -215,7 +217,7 @@ function renderRssFeed(rssItems, data) {
 
     ejs.renderFile('./layout/rss.ejs', { content: resultXML }, {}, (error, resultXML) => {
       if (error) throw error;
-      fs.writeFile(`${destPath}/feeds/rss`, resultXML, fsWriteCallback(`Wrote XML for feed/rss`));
+      fs.writeFile(path.join(destPath, 'feeds', 'rss'), resultXML, fsWriteCallback(`Wrote XML for feed/rss`));
     });
   });
 }
