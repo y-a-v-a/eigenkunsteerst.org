@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
+const debug = require('debug')('eigenkunsteerst');
 const ejs = require('ejs');
 const fse = require('fs-extra');
 const marked = require('marked');
@@ -8,7 +9,7 @@ const frontMatter = require('front-matter');
 
 const fsWriteCallback = msg => error => {
   if (error) throw error;
-  console.log(msg);
+  debug(msg);
 };
 
 const config = require('./data/config');
@@ -51,6 +52,7 @@ fse.emptyDirSync(destPath);
 fse.copySync(images.src, images.dest);
 fse.copySync(assets.src, assets.dest);
 fse.mkdirsSync(`${destPath}/feeds`);
+debug('Set up some directories');
 
 // read article data dir
 fs.readdir(articleSrc, (error, yearDirs) => {
@@ -85,7 +87,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
     fs.readdir(articleSrcYearDir, (error, files) => {
       if (error) throw error;
 
-      console.log('Prepare navigation');
+      debug('Prepare navigation');
       data.site.navigationItems = navigationItems.map(year => {
         return {
           url: year.url,
@@ -127,7 +129,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
           rssItems.push(ejsArticleData);
         }
         if (rssItems.length === 5 && !isRssBuilt) {
-          renderRssFeed(rssItems);
+          renderRssFeed(rssItems, data);
           isRssBuilt = true;
         }
 
@@ -138,7 +140,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
           ejsPageData.body = resultHTML;
           ejsPageData.article = ejsArticleData.article;
 
-          console.log('Rendered article for permaLink');
+          debug('Rendered article for permaLink');
 
           ejs.renderFile('./layout/master.ejs', ejsPageData, {}, (error, pageHTML) => {
             if (error) throw error;
@@ -156,7 +158,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
           if (error) throw error;
 
           yearCollection.push([ejsArticleData.article.date, resultHTML]);
-          console.log('Rendered article for year archive');
+          debug('Rendered article for year archive');
         });
       });
 
@@ -187,8 +189,9 @@ fs.readdir(articleSrc, (error, yearDirs) => {
 });
 
 
-function renderRssFeed(rssItems) {
+function renderRssFeed(rssItems, data) {
   const rssItemsHTML = [];
+  const ejsChannelData = Object.assign({}, data);
 
   rssItems.sort((a, b) => {
     const dateA = a.article.date;
@@ -199,15 +202,14 @@ function renderRssFeed(rssItems) {
     ejs.renderFile('./layout/rss/item.ejs', rssItemData, {}, (error, resultXML) => {
       if (error) throw error;
       rssItemsHTML.push(resultXML);
-      console.log('Rendered RSS item');
+      debug('Rendered RSS item');
     });
   });
 
-  ejsChannelData = Object.assign({}, data);
   ejsChannelData.articles = rssItemsHTML.join('');
   ejs.renderFile('./layout/rss/channel.ejs', ejsChannelData, {}, (error, resultXML) => {
     if (error) throw error;
-    console.log('Rendered RSS channel');
+    debug('Rendered RSS channel');
 
     ejs.renderFile('./layout/rss.ejs', { content: resultXML }, {}, (error, resultXML) => {
       if (error) throw error;

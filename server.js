@@ -3,6 +3,7 @@ const url = require('url');
 const path = require('path');
 const fs = require('fs');
 const port = process.argv[2] || 3000;
+const debug = require('debug')('server');
 
 http.createServer(function(request, response) {
 
@@ -19,7 +20,7 @@ http.createServer(function(request, response) {
 
     if (fs.statSync(filename).isDirectory()) filename += '/index.html';
 
-    console.log(filename);
+    debug(filename);
 
     fs.readFile(filename, 'binary', function(err, file) {
       if(err) {
@@ -36,5 +37,5 @@ http.createServer(function(request, response) {
   });
 }).listen(parseInt(port, 10));
 
-console.log(`Static file server running at => http://localhost:${port}/
+debug(`Static file server running at => http://localhost:${port}/
 CTRL + C to shutdown`);
