@@ -5,12 +5,12 @@ const fs = require('fs');
 const port = process.argv[2] || 3000;
 const debug = require('debug')('server');
 
-http.createServer(function(request, response) {
+http.createServer((request, response) => {
 
   const uri = url.parse(request.url).pathname;
   let filename = path.join(`${process.cwd()}/build`, uri);
 
-  fs.exists(filename, function(exists) {
+  fs.exists(filename, exists => {
     if(!exists) {
       response.writeHead(404, {'Content-Type': 'text/plain'});
       response.write('404 Not Found\n');
@@ -22,7 +22,7 @@ http.createServer(function(request, response) {
 
     debug(filename);
 
-    fs.readFile(filename, 'binary', function(err, file) {
+    fs.readFile(filename, 'binary', (err, file) => {
       if(err) {
         response.writeHead(500, {'Content-Type': 'text/plain'});
         response.write(err + '\n');

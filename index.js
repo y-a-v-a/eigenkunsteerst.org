@@ -26,7 +26,7 @@ const images = {
 const assets = {
   src: './layout/assets/',
   dest: `${destPath}/`
-}
+};
 
 const data = {
   currentYear: new Date().getUTCFullYear(),
@@ -68,14 +68,14 @@ fs.readdir(articleSrc, (error, yearDirs) => {
   // create basic nav data
   yearDirs.sort().reverse().forEach(year => {
     navigationItems.push({
-      url: `/${year}.html`,
+      URL: `/${year}.html`,
       name: `${year}`,
       active: false
     });
   });
 
   // cache most recent year for index.html
-  mostRecentYear = yearDirs[0];
+  let [mostRecentYear] = yearDirs;
   const rssItems = [];
   let isRssBuilt = false;
 
@@ -89,9 +89,10 @@ fs.readdir(articleSrc, (error, yearDirs) => {
 
       debug('Prepare navigation');
       data.site.navigationItems = navigationItems.map(year => {
+        let {URL, name} = year;
         return {
-          url: year.url,
-          name: year.name,
+          URL,
+          name,
           active: year.name == yearDir
         };
       });
@@ -105,6 +106,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
         const rendered = marked(pageData.body);
 
         const fileName = encodeURIComponent(file).replace(/\%20/g, '+').replace('md', 'html');
+        const dateFormatter = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
         const ejsArticleData = {
           article: {
@@ -120,7 +122,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
             content: rendered,
             date: pageData.attributes.date,
             pubDate: pageData.attributes.date,
-            dateString: (new Date(pageData.attributes.date)).toLocaleString('en-US',  { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+            dateString: (new Date(pageData.attributes.date)).toLocaleString('en-US',  dateFormatter),
             license: data.channel.license
           }
         };
