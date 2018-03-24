@@ -1,3 +1,4 @@
+const startTime = Date.now();
 const fs = require('fs');
 const path = require('path');
 
@@ -221,3 +222,7 @@ function renderRssFeed(rssItems, data) {
     });
   });
 }
+
+process.on('exit', code => {
+  debug(`Build took ${Date.now() - startTime}ms`);
+});
