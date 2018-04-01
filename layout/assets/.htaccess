@@ -1,4 +1,4 @@
-Options +FollowSymLinks +ExecCGI
+Options +FollowSymLinks
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
@@ -7,22 +7,7 @@ Options +FollowSymLinks +ExecCGI
   # getting no_script_name to work
   RewriteBase /
 
-  # rewrite if user asks /backoffice dir for backoffice app
-  RewriteRule ^back$ /back.php/ [QSA,L]  
-  RewriteRule ^back/(.*)$ /back.php/$1 [QSA,L]
-
-  # we skip all files with .something
-  RewriteCond %{REQUEST_URI} \..+$
-  RewriteCond %{REQUEST_URI} !\.html$
-  RewriteRule .* - [L]
-
-  # we check if the .html version is here (caching)
-  RewriteRule ^$ index.html [QSA]
-  RewriteRule ^([^.]+)$ $1.html [QSA]
-  RewriteCond %{REQUEST_FILENAME} !-f
-
-  # no, so we redirect to our front web controller
-  RewriteRule ^(.*)$ index.php [QSA,L]
+  RewriteRule ^feeds/rss$ feeds/rss.xml [L,R=301,NE]
 </IfModule>
 
 <IfModule mod_expires.c>

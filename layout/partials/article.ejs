@@ -1,6 +1,6 @@
 <article id="eke<%= article.index %>" class="item" itemscope itemtype="http://schema.org/Article">
   <div class="image">
-    <% if (article.isSingle || article.index === 0) { %>
+    <% if (article.isSingle) { %>
       <img class="article-image" alt="<%= article.title %>" src="/uploads/assets/<%= article.image %>" />
     <% } else { %>
       <img class="article-image sub" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OTEiIGhlaWdodD0iNDAwIiB2aWV3Qm94PSIwIDAgMSAxIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJub25lIj48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iNDkxIiBoZWlnaHQ9IjQwMCIgZmlsbD0icmdiKDE5MSwxOTEsMTkxKSIvPjwvc3ZnPg==" alt="<%= article.title %>" data-original="/uploads/assets/<%= article.image %>">

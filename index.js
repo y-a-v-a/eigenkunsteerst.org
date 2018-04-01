@@ -16,7 +16,8 @@ const fsWriteCallback = msg => error => {
 
 const DATE_FORMATTER = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
-config.baseUrl = 'http://localhost:3000';
+// config.baseUrl = 'http://eigenkunsteerst.test';
+// config.baseUrl = 'http://localhost:3000';
 
 const destPath = './build';
 const articleSrc = './data/articles';
@@ -107,7 +108,8 @@ fs.readdir(articleSrc, (error, yearDirs) => {
         const pageData = frontMatter(articleMd);
         const rendered = marked(pageData.body);
 
-        const fileName = encodeURIComponent(file).replace(/\%20/g, '+').replace('md', 'html');
+        const fileName = file.replace(/ /g, '+').replace('md', 'html');
+        const fileURI = encodeURIComponent(file).replace(/%20/g, '+').replace('md', 'html');
 
         const ejsArticleData = {
           article: {
@@ -119,7 +121,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
             imageName: pageData.attributes.image.replace(/\..*$/, ''),
             baseUrl: data.site.baseUrl,
             titleId: `${pageData.attributes.title}`.replace(/\s+/g, '_'),
-            permaLink: `${data.site.baseUrl}/${yearDir}/${fileName}`,
+            permaLink: `${data.site.baseUrl}/${yearDir}/${fileURI}`,
             content: rendered,
             date: pageData.attributes.date,
             pubDate: pageData.attributes.date,
@@ -199,8 +201,8 @@ function renderRssFeed(rssItems, data) {
   const ejsChannelData = Object.assign({}, data);
 
   rssItems.sort((a, b) => {
-    const dateA = a.article.date;
-    const dateB = b.article.date;
+    const dateA = new Date(a.article.date);
+    const dateB = new Date(b.article.date);
     return dateA > dateB ? -1 : (dateA < dateB ? 1 : 0);
   }).forEach((rssItemData) => {
     rssItemData.article.content = rssItemData.article.content.replace(/<p>/g, '').replace(/<\/p>/g, '<br>');
@@ -218,7 +220,7 @@ function renderRssFeed(rssItems, data) {
 
     ejs.renderFile('./layout/rss.ejs', { content: resultXML }, {}, (error, resultXML) => {
       if (error) throw error;
-      fs.writeFile(path.join(destPath, 'feeds', 'rss'), resultXML, fsWriteCallback(`Wrote XML for feed/rss`));
+      fs.writeFile(path.join(destPath, 'feeds', 'rss.xml'), resultXML, fsWriteCallback(`Wrote XML for feed/rss`));
     });
   });
 }
