@@ -1,3 +1,7 @@
+/**
+ * Static site generator generating HTML and XML (for RSS) from markdown articles using ejs templating.
+ * @author  Vincent Bruijn <v@y-a-v-a.org>
+ */
 const startTime = Date.now();
 const fs = require('fs');
 const path = require('path');
@@ -50,8 +54,10 @@ const data = {
   }
 };
 
+// always empty dest dir first
 fse.emptyDirSync(destPath);
 
+// prepare dest folder by copying assets
 fse.copySync(images.src, images.dest);
 fse.copySync(assets.src, assets.dest);
 fse.mkdirsSync(`${destPath}/feeds`);
@@ -63,12 +69,12 @@ fs.readdir(articleSrc, (error, yearDirs) => {
 
   const navigationItems = [];
 
-  // filter out non-4-digit directories like .DS_Store etc
+  // filter out non-4-digit directories like .DS_Store etc.
   yearDirs = yearDirs.filter(year => {
     return /^[0-9]{4}$/.test(year);
   });
 
-  // create basic nav data
+  // create basic nav data object
   yearDirs.sort().reverse().forEach(year => {
     navigationItems.push({
       URL: `/${year}.html`,
@@ -82,11 +88,13 @@ fs.readdir(articleSrc, (error, yearDirs) => {
   const rssItems = [];
   let isRssBuilt = false;
 
+  // loop over year named directories
   yearDirs.forEach((yearDir, yearIndex) => {
     const articleSrcYearDir = path.join(articleSrc, yearDir);
 
     let yearCollection = [];
 
+    // read files from year directory
     fs.readdir(articleSrcYearDir, (error, files) => {
       if (error) throw error;
 
@@ -100,17 +108,23 @@ fs.readdir(articleSrc, (error, yearDirs) => {
         };
       });
 
+      // process markdown files
       files.forEach((file, index) => {
         const articleFileMd = path.join(articleSrcYearDir, file);
 
         const articleMd = fs.readFileSync(articleFileMd, 'utf8');
 
+        // read meta data from markdown document
         const pageData = frontMatter(articleMd);
+
+        // render markdown into HTML
         const rendered = marked(pageData.body);
 
+        // apply some magic to filenames
         const fileName = file.replace(/ /g, '+').replace('md', 'html');
         const fileURI = encodeURIComponent(file).replace(/%20/g, '+').replace('md', 'html');
 
+        // populate basic article data object
         const ejsArticleData = {
           article: {
             index,
@@ -130,6 +144,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
           }
         };
 
+        // add last 5 articles to rssItems list
         if (rssItems.length < 5) {
           rssItems.push(ejsArticleData);
         }
@@ -138,6 +153,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
           isRssBuilt = true;
         }
 
+        // process article template
         ejs.renderFile('./layout/partials/article.ejs', ejsArticleData, {}, (error, resultHTML) => {
           if (error) throw error;
 
@@ -159,6 +175,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
 
         ejsArticleData.article.isSingle = false;
 
+        // process article template for year overview page
         ejs.renderFile('./layout/partials/article.ejs', ejsArticleData, {}, (error, resultHTML) => {
           if (error) throw error;
 
@@ -200,11 +217,13 @@ function renderRssFeed(rssItems, data) {
   const rssItemsHTML = [];
   const ejsChannelData = Object.assign({}, data);
 
+  // sort rss items on date
   rssItems.sort((a, b) => {
     const dateA = new Date(a.article.date);
     const dateB = new Date(b.article.date);
     return dateA > dateB ? -1 : (dateA < dateB ? 1 : 0);
   }).forEach((rssItemData) => {
+    // render xml for each item
     rssItemData.article.content = rssItemData.article.content.replace(/<p>/g, '').replace(/<\/p>/g, '<br>');
     ejs.renderFile('./layout/rss/item.ejs', rssItemData, {}, (error, resultXML) => {
       if (error) throw error;
@@ -213,11 +232,13 @@ function renderRssFeed(rssItems, data) {
     });
   });
 
+  // render channel meta data xml
   ejsChannelData.articles = rssItemsHTML.join('');
   ejs.renderFile('./layout/rss/channel.ejs', ejsChannelData, {}, (error, resultXML) => {
     if (error) throw error;
     debug('Rendered RSS channel');
 
+    // render and write whole rss xml
     ejs.renderFile('./layout/rss.ejs', { content: resultXML }, {}, (error, resultXML) => {
       if (error) throw error;
       fs.writeFile(path.join(destPath, 'feeds', 'rss.xml'), resultXML, fsWriteCallback(`Wrote XML for feed/rss`));
