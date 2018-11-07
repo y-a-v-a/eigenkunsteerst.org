@@ -11,7 +11,31 @@
 
   <%- include('partials/footer') %>
 
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script defer src="/js/jquery.lazyload.min.js"></script>
+  <script src="https://cdn.polyfill.io/v2/polyfill.js?features=IntersectionObserver|gated"></script>
+  <script>
+    (function() {
+      var attributeName = 'data-original';
+      var io = new IntersectionObserver(
+        function(entries) {
+          entries.forEach(function(el) {
+            if (el.intersectionRatio > 0 && el.target.nodeName === 'IMG') {
+              if (el.target.hasAttribute(attributeName)) {
+                el.target.setAttribute('src', el.target.getAttribute(attributeName));
+                el.target.removeAttribute(attributeName);
+              }
+            }
+          });
+        }
+      );
+
+      document.querySelectorAll('.article-image').forEach(function(el) {
+        io.observe(el);
+      });
+    }());
+
+  </script>
+  <link href="http://fonts.googleapis.com/css?family=Montserrat:700|Open+Sans" rel="stylesheet" type="text/css">
+
+  <%- include('partials/ua') %>
 </body>
 </html>

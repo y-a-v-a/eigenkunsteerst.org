@@ -11,6 +11,9 @@ const ejs = require('ejs');
 const fse = require('fs-extra');
 const marked = require('marked');
 const frontMatter = require('front-matter');
+const postcss = require('postcss');
+const cssnano = require('cssnano');
+
 const config = require('./data/config');
 
 const fsWriteCallback = msg => error => {
@@ -60,6 +63,15 @@ fse.emptyDirSync(destPath);
 // prepare dest folder by copying assets
 fse.copySync(images.src, images.dest);
 fse.copySync(assets.src, assets.dest);
+
+const cssSrcPath = `${assets.src}/css/main.css`;
+const cssDestPath = `${assets.dest}/css/main.css`;
+const css = fs.readFileSync(cssSrcPath);
+postcss(cssnano).process(css, { from: cssSrcPath, to: cssDestPath })
+.then(result => {
+  fs.writeFile(cssDestPath, result.css, () => true);
+});
+
 fse.mkdirsSync(`${destPath}/feeds`);
 debug('Set up some directories');
 

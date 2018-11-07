@@ -11,11 +11,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cssnano": "^4.1.7",
     "debug": "^3.1.0",
     "ejs": "^2.5.7",
     "front-matter": "^2.3.0",
     "fs-extra": "^5.0.0",
     "marked": "^0.3.17",
-    "mysql": "^2.15.0"
+    "mysql": "^2.15.0",
+    "postcss": "^7.0.5"
   }
 }

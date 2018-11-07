@@ -4,7 +4,7 @@ Static Site Generator that will output a set of plain HTML and XML files based u
 
 ## Build
 
-To build the static sites call `npm run build`. To run a simple debug server call `npm run server`.
+To build the static sites call `npm run build`. To run a simple debug server call `npm start`.
 
 ## Inspiration
 

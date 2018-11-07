@@ -174,20 +174,6 @@ footer {
     width: 1009px;
 }
 
-.eke-togo {
-  color: #000;
-}
-
-.cc-img {
-  border-width:0;
-  vertical-align: middle;
-}
-
-.eke-more:hover {
-  text-decoration: none;
-  cursor: pointer;
-}
-
 .item {
     overflow: hidden;
     margin-bottom: 128px;
@@ -245,12 +231,6 @@ footer {
   margin-left: 0px;
   margin-bottom: -8px;
   }*/
-
-.addthis_toolbox {
-    display: inline-block;
-    width: 64px;
-  min-height: 16px;
-}
 
 .subinfo {
     visibility: hidden;
@@ -327,8 +307,13 @@ footer {
 }
 
 @media screen and (max-width: 480px) {
+  #nav a {
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+
   #eke-header {
-    width: 480px;
+    width: 100%;
   }
 
   #eke-main {
@@ -336,24 +321,24 @@ footer {
   }
 
   .image, .image img {
-    width: 480px;
+    width: 100%;
   }
 
   .item-text {
-    width: 460px;
+    width: calc(100% - 20px);
     padding: 0 10px;
   }
 
   footer {
-    width: 480px;
+    width: 100%;
     margin-left: 0;
     text-align: center;
   }
 }
 
-@media screen and (max-width: 320px) {
+@media screen and (max-width: 375px) {
   #eke-header {
-    width: 320px;
+    width: 100%;
     margin: 16px 0 32px 0;
   }
 
@@ -372,30 +357,11 @@ footer {
 
   #nav {
     margin-left: 0;
-    width: 320px;
-  }
-
-  #eke-main {
-    margin-left: 0;
+    width: 100%;
   }
 
   .image {
     margin: 0 0 16px 0;
-  }
-
-  .image, .image img {
-    width: 320px;
-  }
-
-  .item-text {
-    width: 300px;
-    padding: 0 10px;
-  }
-
-  footer {
-    width: 320px;
-    margin-left: 0;
-    text-align: center;
   }
 
   footer a[rel="license"] {
