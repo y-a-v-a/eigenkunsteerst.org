@@ -2,6 +2,8 @@
 title: Goed verhaal
 image: vincent_bruijn_ax710_malevich_henk_schiffmacher.jpg
 date: Sun Mar 22 2015 20:13:12 GMT+0100 (CET)
+keywords: Henk Schiffmacher, Malevich tattoo, Stedelijk Museum Amsterdam
+description: Hoe ik aan mijn tattoeage van Malevich kom, met dank aan Stedelijk Musem Amsterdam en Henk Schiffmacher
 ---
 
 Nevenstaande afbeelding toont mijn tatoeage. Dat ik, bijna 37 jaar, nog mijn eerste tatoeage zou laten zetten, had ik zelf ook niet helemaal gedacht. Ik riep wel al jaren dat het me wel gaaf zou lijken om een schilderij op mijn lichaam te laten tatoeëren, maar iets weerhield me er altijd van. Met name de hamvraag: welk schilderij?<br>

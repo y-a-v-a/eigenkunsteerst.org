@@ -43,6 +43,8 @@ const data = {
   site: {
     baseUrl: config.baseUrl,
     title: config.siteTitle,
+    keywords: config.metaKeywords,
+    description: config.metaDescription,
     navigationItems: [],
     image: ''
   },
@@ -152,7 +154,9 @@ fs.readdir(articleSrc, (error, yearDirs) => {
             date: pageData.attributes.date,
             pubDate: pageData.attributes.date,
             dateString: (new Date(pageData.attributes.date)).toLocaleString('en-US',  DATE_FORMATTER),
-            license: data.channel.license
+            license: data.channel.license,
+            keywords: pageData.attributes.keywords || config.metaKeywords,
+            description: pageData.attributes.description || config.metaDescription
           }
         };
 

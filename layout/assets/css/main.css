@@ -46,10 +46,11 @@ a:visited {
 }
 
 p {
-  font-size: 0.96em;
-    margin-bottom: 16px;
+  font-size: 1.1em;
+  margin-bottom: 16px;
   line-height: 1.7;
 }
+
 p + p {
   text-indent: 24px;
 }
