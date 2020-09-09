@@ -3,6 +3,9 @@ Options +FollowSymLinks
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
+  RewriteCond %{HTTP_HOST} ^eigenkunsteerst.org [NC]
+  RewriteRule ^ https://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
   # uncomment the following line, if you are having trouble
   # getting no_script_name to work
   RewriteBase /
@@ -80,6 +83,6 @@ Options +FollowSymLinks
 </IfModule>
 
 # big crash from our front web controller
-ErrorDocument 500 "<h2>Application error</h2>symfony application failed to start properly"
+ErrorDocument 500 "<h2>Application error</h2>Application failed to start properly"
 # ErrorDocument 404 "ERROR 404<br /><a href=\"http://www.eigenkunsteerst.org/\" target=\"_self\">return</a>"
 ErrorDocument 404 /404.html
