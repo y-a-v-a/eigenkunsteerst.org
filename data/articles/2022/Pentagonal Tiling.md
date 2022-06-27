@@ -9,3 +9,8 @@ description: Pentagonal tiles in my toilet
 Pentagonal Tiles
 
 A few years back I read a newspaper article about the mathematical complexities around pentagonal tiling. Tiling itself can be already be approached as a mathematical problem field, of which pentagonal tiling appears to be a difficult sub genre. It is only since 2015 that scientists have proven that there are only 15 different tile forms of pentagonal tiles that actually are "tileable".
+
+Casey Mann
+
+https://www.19hetatelier.nl/projects/meerscholengebouw-de-garve-lochem/
+
