@@ -30,12 +30,12 @@ const destPath = './build';
 const articleSrc = './data/articles';
 const images = {
   src: './data/images/',
-  dest: `${destPath}/uploads/assets/`
+  dest: `${destPath}/uploads/assets/`,
 };
 
 const assets = {
   src: './layout/assets/',
-  dest: `${destPath}/`
+  dest: `${destPath}/`,
 };
 
 const data = {
@@ -46,7 +46,7 @@ const data = {
     keywords: config.metaKeywords,
     description: config.metaDescription,
     navigationItems: [],
-    image: ''
+    image: '',
   },
   channel: {
     title: config.rssTitle,
@@ -54,9 +54,9 @@ const data = {
     description: config.description,
     language: config.language,
     copyright: config.copyright,
-    lastBuildDate: (new Date()).toString(),
-    license: config.license
-  }
+    lastBuildDate: new Date().toString(),
+    license: config.license,
+  },
 };
 
 // always empty dest dir first
@@ -69,10 +69,11 @@ fse.copySync(assets.src, assets.dest);
 const cssSrcPath = `${assets.src}/css/main.css`;
 const cssDestPath = `${assets.dest}/css/main.css`;
 const css = fs.readFileSync(cssSrcPath);
-postcss(cssnano).process(css, { from: cssSrcPath, to: cssDestPath })
-.then(result => {
-  fs.writeFile(cssDestPath, result.css, () => true);
-});
+postcss(cssnano)
+  .process(css, { from: cssSrcPath, to: cssDestPath })
+  .then(result => {
+    fs.writeFile(cssDestPath, result.css, () => true);
+  });
 
 fse.mkdirsSync(`${destPath}/feeds`);
 debug('Set up some directories');
@@ -89,13 +90,16 @@ fs.readdir(articleSrc, (error, yearDirs) => {
   });
 
   // create basic nav data object
-  yearDirs.sort().reverse().forEach(year => {
-    navigationItems.push({
-      URL: `/${year}.html`,
-      name: `${year}`,
-      active: false
+  yearDirs
+    .sort()
+    .reverse()
+    .forEach(year => {
+      navigationItems.push({
+        URL: `/${year}.html`,
+        name: `${year}`,
+        active: false,
+      });
     });
-  });
 
   // cache most recent year for index.html
   let [mostRecentYear] = yearDirs;
@@ -114,11 +118,11 @@ fs.readdir(articleSrc, (error, yearDirs) => {
 
       debug('Prepare navigation');
       data.site.navigationItems = navigationItems.map(year => {
-        let {URL, name} = year;
+        let { URL, name } = year;
         return {
           URL,
           name,
-          active: year.name === yearDir
+          active: year.name === yearDir,
         };
       });
 
@@ -132,7 +136,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
         const pageData = frontMatter(articleMd);
 
         // render markdown into HTML
-        const rendered = marked(pageData.body);
+        const rendered = marked.parse(pageData.body);
 
         // apply some magic to filenames
         const fileName = file.replace(/ /g, '+').replace('md', 'html');
@@ -153,11 +157,11 @@ fs.readdir(articleSrc, (error, yearDirs) => {
             content: rendered,
             date: pageData.attributes.date,
             pubDate: pageData.attributes.date,
-            dateString: (new Date(pageData.attributes.date)).toLocaleString('en-US',  DATE_FORMATTER),
+            dateString: new Date(pageData.attributes.date).toLocaleString('en-US', DATE_FORMATTER),
             license: data.channel.license,
             keywords: pageData.attributes.keywords || config.metaKeywords,
-            description: pageData.attributes.description || config.metaDescription
-          }
+            description: pageData.attributes.description || config.metaDescription,
+          },
         };
 
         // add last 5 articles to rssItems list
@@ -185,7 +189,11 @@ fs.readdir(articleSrc, (error, yearDirs) => {
             const yearDirName = `${destPath}/${yearDir}`;
 
             fse.mkdirsSync(yearDirName);
-            fs.writeFile(path.join(yearDirName, fileName), pageHTML, fsWriteCallback(`Wrote HTML for ${file}`));
+            fs.writeFile(
+              path.join(yearDirName, fileName),
+              pageHTML,
+              fsWriteCallback(`Wrote HTML for ${file}`)
+            );
           });
         });
 
@@ -195,29 +203,38 @@ fs.readdir(articleSrc, (error, yearDirs) => {
         ejs.renderFile('./layout/partials/article.ejs', ejsArticleData, {}, (error, resultHTML) => {
           if (error) throw error;
 
-          yearCollection.push([ejsArticleData.article.date, resultHTML, ejsArticleData.article.image]);
+          yearCollection.push([
+            ejsArticleData.article.date,
+            resultHTML,
+            ejsArticleData.article.image,
+          ]);
           debug('Rendered article for year archive');
         });
       });
 
       if (yearCollection.length) {
         let ejsPageData = Object.assign({}, data);
-        yearCollection = yearCollection.sort((a, b) => {
-          let dateA = new Date(a[0]);
-          let dateB = new Date(b[0]);
-          return dateA > dateB ? 1 : dateA < dateB ? -1 : 0;
-        }).reverse();
+        yearCollection = yearCollection
+          .sort((a, b) => {
+            let dateA = new Date(a[0]);
+            let dateB = new Date(b[0]);
+            return dateA > dateB ? 1 : dateA < dateB ? -1 : 0;
+          })
+          .reverse();
 
         ejsPageData.body = yearCollection.map(el => el[1]).join('\n');
         ejsPageData.article = false;
-        let [[ , , firstImage]] = yearCollection;
+        let [[, , firstImage]] = yearCollection;
         ejsPageData.site.image = firstImage;
 
         ejs.renderFile('./layout/master.ejs', ejsPageData, {}, (error, pageHTML) => {
           if (error) throw error;
 
-          fs.writeFile(path.join(destPath, `${yearDir}.html`), pageHTML,
-            fsWriteCallback(`Wrote HTML for ${yearDir}`));
+          fs.writeFile(
+            path.join(destPath, `${yearDir}.html`),
+            pageHTML,
+            fsWriteCallback(`Wrote HTML for ${yearDir}`)
+          );
           if (mostRecentYear === yearDir) {
             const fileName = path.join(destPath, 'index.html');
 
@@ -234,19 +251,23 @@ function renderRssFeed(rssItems, data) {
   const ejsChannelData = Object.assign({}, data);
 
   // sort rss items on date
-  rssItems.sort((a, b) => {
-    const dateA = new Date(a.article.date);
-    const dateB = new Date(b.article.date);
-    return dateA > dateB ? -1 : (dateA < dateB ? 1 : 0);
-  }).forEach((rssItemData) => {
-    // render xml for each item
-    rssItemData.article.content = rssItemData.article.content.replace(/<p>/g, '').replace(/<\/p>/g, '<br>');
-    ejs.renderFile('./layout/rss/item.ejs', rssItemData, {}, (error, resultXML) => {
-      if (error) throw error;
-      rssItemsHTML.push(resultXML);
-      debug('Rendered RSS item');
+  rssItems
+    .sort((a, b) => {
+      const dateA = new Date(a.article.date);
+      const dateB = new Date(b.article.date);
+      return dateA > dateB ? -1 : dateA < dateB ? 1 : 0;
+    })
+    .forEach(rssItemData => {
+      // render xml for each item
+      rssItemData.article.content = rssItemData.article.content
+        .replace(/<p>/g, '')
+        .replace(/<\/p>/g, '<br>');
+      ejs.renderFile('./layout/rss/item.ejs', rssItemData, {}, (error, resultXML) => {
+        if (error) throw error;
+        rssItemsHTML.push(resultXML);
+        debug('Rendered RSS item');
+      });
     });
-  });
 
   // render channel meta data xml
   ejsChannelData.articles = rssItemsHTML.join('');
@@ -257,7 +278,11 @@ function renderRssFeed(rssItems, data) {
     // render and write whole rss xml
     ejs.renderFile('./layout/rss.ejs', { content: resultXML }, {}, (error, resultXML) => {
       if (error) throw error;
-      fs.writeFile(path.join(destPath, 'feeds', 'rss.xml'), resultXML, fsWriteCallback(`Wrote XML for feed/rss`));
+      fs.writeFile(
+        path.join(destPath, 'feeds', 'rss.xml'),
+        resultXML,
+        fsWriteCallback(`Wrote XML for feed/rss`)
+      );
     });
   });
 }
