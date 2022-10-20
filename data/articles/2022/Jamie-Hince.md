@@ -6,8 +6,6 @@ keywords: Jamie Hince, the Kills
 description: Hommage to Jamie Hince
 ---
 
-Jamie Hince
-
 Somewhere in 2004 I felt the urge to discover new music. Not necessarily new as in ground breaking in technological sense, I just had the feeling there should be more people around who play and record the musical style and feel that I fancy.
 
 My crave, keep in mind this was the pre-Spotify era, lead me to play records at record stores and seek the internet for MP3's of various bands. It left me with an unsatisfactory feeling.
