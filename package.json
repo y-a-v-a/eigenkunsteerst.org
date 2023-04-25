@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cssnano": "^5.1.13",
+    "cssnano": "^6.0.0",
     "debug": "^3.1.0",
     "ejs": "^3.1.8",
     "front-matter": "^2.3.0",
