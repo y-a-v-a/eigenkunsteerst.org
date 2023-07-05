@@ -168,7 +168,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
             date: pageData.attributes.date,
             pubDate: pageData.attributes.date,
             dateString: new Date(pageData.attributes.date).toLocaleString(
-              'en-US',
+              'nl-NL',
               DATE_FORMATTER
             ),
             license: data.channel.license,

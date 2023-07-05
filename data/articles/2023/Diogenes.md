@@ -16,7 +16,7 @@ But this wasn't all; I was conviced that I had seen it in another. At least, I h
 
 And contrary to _Sophie's World_, in which the perspective is more of a young adult being a bit frightened by the potential insult by Diogenes, Harari's use is supporting the argument in his textual lecture. The comic drawings support his talk, while in the former one experiences the situation at the jar.
 
-In Barabara Stok's interpretation, the scene plays more the role of an eye opener to the main character Hipparchia – a female thinker with limited access to knowledge due to her cultural context. As she starts to reconsider her whole upbringing and social position after gaining interest in philosophical cynicism due a servant telling her The Anecdote.
+In Barabara Stok's interpretation, the scene plays more the role of an eye opener to the main character Hipparchia – a female thinker with limited access to knowledge due to her cultural context. As she starts to reconsider her whole upbringing and social position after gaining interest in philosophical cynicism due to a servant telling her The Anecdote.
 
 So apart from visual differences in line, color, depiction of texture and shadows, these three interpretations all support the main story in a different way. Over the past centuries many more artists have depicted The Anecdote and these three approaches are great additions to that collection. I can imagine there's more graphic novels out there that contain The Anecdote – I sure hope to find these sometime.
 
