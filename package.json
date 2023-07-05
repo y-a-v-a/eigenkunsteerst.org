@@ -4,7 +4,6 @@
   "description": "Blog of Vincent Bruijn",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "DEBUG=* node index.js",
     "start": "DEBUG=* node server.js"
   },
@@ -16,7 +15,7 @@
     "ejs": "^3.1.8",
     "front-matter": "^2.3.0",
     "fs-extra": "^5.0.0",
-    "marked": "^4.1.1",
+    "marked": "^4.3.0",
     "mysql": "^2.15.0",
     "postcss": "^8"
   }

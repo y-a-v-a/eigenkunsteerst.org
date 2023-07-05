@@ -22,5 +22,4 @@ Similarly I like the dead simple **Dead Road 7**, a song that reminds me of earl
 
 I've always been a fan of small musical setups: one or two guitars, zero or one bass player and some form of rythm, a drummer or a drumming machine. It all comes together in _the Kills_, in their mix of UK punk rock influences combined with American blues and rock. _Jamie Hince_ deserves more credit and recognition for his contributions to guitar playing due to his unique style and particular sound.
 
-
 Photo: Vincent Bruijn, 2014

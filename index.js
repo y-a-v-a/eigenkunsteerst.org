@@ -180,7 +180,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
 
         // add last 5 articles to rssItems list
         if (rssItems.length < 5) {
-          rssItems.push(ejsArticleData);
+          rssItems.push({ ...ejsArticleData.article });
         }
         if (rssItems.length === 5 && !isRssBuilt) {
           renderRssFeed(rssItems, data);
@@ -291,18 +291,18 @@ function renderRssFeed(rssItems, data) {
   // sort rss items on date
   rssItems
     .sort((a, b) => {
-      const dateA = new Date(a.article.date);
-      const dateB = new Date(b.article.date);
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
       return dateA > dateB ? -1 : dateA < dateB ? 1 : 0;
     })
     .forEach((rssItemData) => {
       // render xml for each item
-      rssItemData.article.content = rssItemData.article.content
+      rssItemData.content = rssItemData.content
         .replace(/<p>/g, '')
         .replace(/<\/p>/g, '<br>');
       ejs.renderFile(
         './layout/rss/item.ejs',
-        rssItemData,
+        { article: rssItemData },
         {},
         (error, resultXML) => {
           if (error) throw error;

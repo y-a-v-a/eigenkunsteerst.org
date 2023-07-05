@@ -20,7 +20,6 @@ In Barabara Stok's interpretation, the scene plays more the role of an eye opene
 
 So apart from visual differences in line, color, depiction of texture and shadows, these three interpretations all support the main story in a different way. Over the past centuries many more artists have depicted The Anecdote and these three approaches are great additions to that collection. I can imagine there's more graphic novels out there that contain The Anecdote – I sure hope to find these sometime.
 
-
 Images taken from:
 
 - _The Philosopher, the Dog and the Wedding: The Story of the Infamous Female Philosopher Hipparchia_ by Barbara Stok, 2022
