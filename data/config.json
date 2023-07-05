@@ -1,5 +1,5 @@
 {
-  "baseUrl": "http://www.eigenkunsteerst.org",
+  "baseUrl": "https://www.eigenkunsteerst.org",
   "rssTitle": "Eigen Kunst Eerst! | Blog",
   "siteTitle": "Eigen Kunst Eerst! &bull; Blog",
   "titleSuffix": " &bull; Eigen Kunst Eerst! &bull; Blog",
@@ -8,5 +8,5 @@
   "metaKeywords": "eigen kunst eerst, kunstblog, art blog, art blog amsterdam, exhibition reviews amsterdam, kunstblog amsterdam, Vincent Bruijn, kunst blog, beeldende kunst blog, recensie blog, kunstrecensie blog",
   "language": "nl-NL",
   "copyright": "copyleft Vincent Bruijn",
-  "license": "http://creativecommons.org/licenses/by-nc-sa/3.0/"
+  "license": "https://creativecommons.org/licenses/by-nc-sa/3.0/"
 }

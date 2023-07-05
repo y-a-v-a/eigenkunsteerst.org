@@ -16,12 +16,17 @@ const cssnano = require('cssnano');
 
 const config = require('./data/config');
 
-const fsWriteCallback = msg => error => {
+const fsWriteCallback = (msg) => (error) => {
   if (error) throw error;
   debug(msg);
 };
 
-const DATE_FORMATTER = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+const DATE_FORMATTER = {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+};
 
 // config.baseUrl = 'http://eigenkunsteerst.test';
 // config.baseUrl = 'http://localhost:3000';
@@ -71,7 +76,7 @@ const cssDestPath = `${assets.dest}/css/main.css`;
 const css = fs.readFileSync(cssSrcPath);
 postcss(cssnano)
   .process(css, { from: cssSrcPath, to: cssDestPath })
-  .then(result => {
+  .then((result) => {
     fs.writeFile(cssDestPath, result.css, () => true);
   });
 
@@ -85,7 +90,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
   const navigationItems = [];
 
   // filter out non-4-digit directories like .DS_Store etc.
-  yearDirs = yearDirs.filter(year => {
+  yearDirs = yearDirs.filter((year) => {
     return /^[0-9]{4}$/.test(year);
   });
 
@@ -93,7 +98,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
   yearDirs
     .sort()
     .reverse()
-    .forEach(year => {
+    .forEach((year) => {
       navigationItems.push({
         URL: `/${year}.html`,
         name: `${year}`,
@@ -117,7 +122,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
       if (error) throw error;
 
       debug('Prepare navigation');
-      data.site.navigationItems = navigationItems.map(year => {
+      data.site.navigationItems = navigationItems.map((year) => {
         let { URL, name } = year;
         return {
           URL,
@@ -128,6 +133,9 @@ fs.readdir(articleSrc, (error, yearDirs) => {
 
       // process markdown files
       files.forEach((file, index) => {
+        if (file.startsWith('_')) {
+          return;
+        }
         const articleFileMd = path.join(articleSrcYearDir, file);
 
         const articleMd = fs.readFileSync(articleFileMd, 'utf8');
@@ -136,11 +144,13 @@ fs.readdir(articleSrc, (error, yearDirs) => {
         const pageData = frontMatter(articleMd);
 
         // render markdown into HTML
-        const rendered = marked.parse(pageData.body);
+        const rendered = marked.parse(pageData.body, { pedantic: true });
 
         // apply some magic to filenames
         const fileName = file.replace(/ /g, '+').replace('md', 'html');
-        const fileURI = encodeURIComponent(file).replace(/%20/g, '+').replace('md', 'html');
+        const fileURI = encodeURIComponent(file)
+          .replace(/%20/g, '+')
+          .replace('md', 'html');
 
         // populate basic article data object
         const ejsArticleData = {
@@ -157,10 +167,14 @@ fs.readdir(articleSrc, (error, yearDirs) => {
             content: rendered,
             date: pageData.attributes.date,
             pubDate: pageData.attributes.date,
-            dateString: new Date(pageData.attributes.date).toLocaleString('en-US', DATE_FORMATTER),
+            dateString: new Date(pageData.attributes.date).toLocaleString(
+              'en-US',
+              DATE_FORMATTER
+            ),
             license: data.channel.license,
             keywords: pageData.attributes.keywords || config.metaKeywords,
-            description: pageData.attributes.description || config.metaDescription,
+            description:
+              pageData.attributes.description || config.metaDescription,
           },
         };
 
@@ -174,73 +188,97 @@ fs.readdir(articleSrc, (error, yearDirs) => {
         }
 
         // process article template
-        ejs.renderFile('./layout/partials/article.ejs', ejsArticleData, {}, (error, resultHTML) => {
-          if (error) throw error;
-
-          const ejsPageData = Object.assign({}, data);
-          ejsPageData.body = resultHTML;
-          ejsPageData.article = ejsArticleData.article;
-
-          debug('Rendered article for permaLink');
-
-          ejs.renderFile('./layout/master.ejs', ejsPageData, {}, (error, pageHTML) => {
+        ejs.renderFile(
+          './layout/partials/article.ejs',
+          ejsArticleData,
+          {},
+          (error, resultHTML) => {
             if (error) throw error;
 
-            const yearDirName = `${destPath}/${yearDir}`;
+            const ejsPageData = Object.assign({}, data);
+            ejsPageData.body = resultHTML;
+            ejsPageData.article = ejsArticleData.article;
 
-            fse.mkdirsSync(yearDirName);
-            fs.writeFile(
-              path.join(yearDirName, fileName),
-              pageHTML,
-              fsWriteCallback(`Wrote HTML for ${file}`)
+            debug('Rendered article for permaLink');
+
+            ejs.renderFile(
+              './layout/master.ejs',
+              ejsPageData,
+              {},
+              (error, pageHTML) => {
+                if (error) throw error;
+
+                const yearDirName = `${destPath}/${yearDir}`;
+
+                fse.mkdirsSync(yearDirName);
+                fs.writeFile(
+                  path.join(yearDirName, fileName),
+                  pageHTML,
+                  fsWriteCallback(`Wrote HTML for ${file}`)
+                );
+              }
             );
-          });
-        });
+          }
+        );
 
         ejsArticleData.article.isSingle = false;
 
         // process article template for year overview page
-        ejs.renderFile('./layout/partials/article.ejs', ejsArticleData, {}, (error, resultHTML) => {
-          if (error) throw error;
+        ejs.renderFile(
+          './layout/partials/article.ejs',
+          ejsArticleData,
+          {},
+          (error, resultHTML) => {
+            if (error) throw error;
 
-          yearCollection.push([
-            ejsArticleData.article.date,
-            resultHTML,
-            ejsArticleData.article.image,
-          ]);
-          debug('Rendered article for year archive');
-        });
+            yearCollection.push([
+              ejsArticleData.article.date,
+              resultHTML,
+              ejsArticleData.article.image,
+            ]);
+            debug('Rendered article for year archive');
+          }
+        );
       });
 
       if (yearCollection.length) {
         let ejsPageData = Object.assign({}, data);
         yearCollection = yearCollection
           .sort((a, b) => {
-            let dateA = new Date(a[0]);
-            let dateB = new Date(b[0]);
+            let dateA = new Date(a[0]).getTime();
+            let dateB = new Date(b[0]).getTime();
             return dateA > dateB ? 1 : dateA < dateB ? -1 : 0;
           })
           .reverse();
 
-        ejsPageData.body = yearCollection.map(el => el[1]).join('\n');
+        ejsPageData.body = yearCollection.map((el) => el[1]).join('\n');
         ejsPageData.article = false;
         let [[, , firstImage]] = yearCollection;
         ejsPageData.site.image = firstImage;
 
-        ejs.renderFile('./layout/master.ejs', ejsPageData, {}, (error, pageHTML) => {
-          if (error) throw error;
+        ejs.renderFile(
+          './layout/master.ejs',
+          ejsPageData,
+          {},
+          (error, pageHTML) => {
+            if (error) throw error;
 
-          fs.writeFile(
-            path.join(destPath, `${yearDir}.html`),
-            pageHTML,
-            fsWriteCallback(`Wrote HTML for ${yearDir}`)
-          );
-          if (mostRecentYear === yearDir) {
-            const fileName = path.join(destPath, 'index.html');
+            fs.writeFile(
+              path.join(destPath, `${yearDir}.html`),
+              pageHTML,
+              fsWriteCallback(`Wrote HTML for ${yearDir}`)
+            );
+            if (mostRecentYear === yearDir) {
+              const fileName = path.join(destPath, 'index.html');
 
-            fs.writeFile(fileName, pageHTML, fsWriteCallback(`Wrote HTML for index.html`));
+              fs.writeFile(
+                fileName,
+                pageHTML,
+                fsWriteCallback(`Wrote HTML for index.html`)
+              );
+            }
           }
-        });
+        );
       }
     });
   });
@@ -257,36 +295,51 @@ function renderRssFeed(rssItems, data) {
       const dateB = new Date(b.article.date);
       return dateA > dateB ? -1 : dateA < dateB ? 1 : 0;
     })
-    .forEach(rssItemData => {
+    .forEach((rssItemData) => {
       // render xml for each item
       rssItemData.article.content = rssItemData.article.content
         .replace(/<p>/g, '')
         .replace(/<\/p>/g, '<br>');
-      ejs.renderFile('./layout/rss/item.ejs', rssItemData, {}, (error, resultXML) => {
-        if (error) throw error;
-        rssItemsHTML.push(resultXML);
-        debug('Rendered RSS item');
-      });
+      ejs.renderFile(
+        './layout/rss/item.ejs',
+        rssItemData,
+        {},
+        (error, resultXML) => {
+          if (error) throw error;
+          rssItemsHTML.push(resultXML);
+          debug('Rendered RSS item');
+        }
+      );
     });
 
   // render channel meta data xml
   ejsChannelData.articles = rssItemsHTML.join('');
-  ejs.renderFile('./layout/rss/channel.ejs', ejsChannelData, {}, (error, resultXML) => {
-    if (error) throw error;
-    debug('Rendered RSS channel');
-
-    // render and write whole rss xml
-    ejs.renderFile('./layout/rss.ejs', { content: resultXML }, {}, (error, resultXML) => {
+  ejs.renderFile(
+    './layout/rss/channel.ejs',
+    ejsChannelData,
+    {},
+    (error, resultXML) => {
       if (error) throw error;
-      fs.writeFile(
-        path.join(destPath, 'feeds', 'rss.xml'),
-        resultXML,
-        fsWriteCallback(`Wrote XML for feed/rss`)
+      debug('Rendered RSS channel');
+
+      // render and write whole rss xml
+      ejs.renderFile(
+        './layout/rss.ejs',
+        { content: resultXML },
+        {},
+        (error, resultXML) => {
+          if (error) throw error;
+          fs.writeFile(
+            path.join(destPath, 'feeds', 'rss.xml'),
+            resultXML,
+            fsWriteCallback(`Wrote XML for feed/rss`)
+          );
+        }
       );
-    });
-  });
+    }
+  );
 }
 
-process.on('exit', code => {
+process.on('exit', (code) => {
   debug(`Build took ${Date.now() - startTime}ms`);
 });

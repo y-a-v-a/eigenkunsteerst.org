@@ -6,7 +6,6 @@ keywords: Vincent van Gogh, Anna van Gogh-Carbentus, Begraafplaats Groenesteeg L
 description: De moeder van Vincent van Gogh ligt op Begraafplaats Groenesteeg te Leiden begraven
 ---
 
-
 Van niemand die ik ken, afgezien van zéér directe familie, heb ik ooit een echt gepland bezoek aan hun graf gebracht, en al helemaal niet naar graven van meer familieleden van eender wie dan van Vincent van Gogh. Hoewel, in 1996 bezocht ik in Parijs de graven van Jim Morrison en Oscar Wilde op _Cimetière du Père-Lachaise_. Bezoek aan de eerste was zeer zeker gepland, die aan de tweede een bijzondere bijkomstigheid, net als die aan Gay-Lussac, en aan anderen van wie ik me de naam niet meer voor de geest kan halen, maar wel te vinden weet in het fotoboek dat ik van die vakantie maakte, gefotografeerd in zwart-wit, en waarachtig zelf afgedrukt.
 
 De ontdekking dat de _bed and breakfast_ die wij halverwege vakantie- en thuisadres reserveerden op nog geen tien kilometer van de begraafplaats van _Auvers-sur-Oise_ af lag, deed mij volharden dan toch het graf van Vincent en Theo van Gogh ook te bezoeken. Dat bleek geen slecht besluit. Op de zeer rustige en zonnige ochtend van 5 augustus 2017 stonden wij aan het eenvoudige graf van de van Goghs. Daar kwam ik op het woord "graf-fie": de huidige neiging zichzelf te fotograferen – de selfie – gecombineerd met de licht morbide voorkeur te willen vastleggen iemands graf bezocht te hebben; een tronie met tegel, zal ik maar zeggen.

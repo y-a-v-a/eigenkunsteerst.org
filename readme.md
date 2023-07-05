@@ -6,6 +6,8 @@ Static Site Generator that will output a set of plain HTML and XML files based u
 
 To build the static sites call `npm run build`. To run a simple debug server call `npm start`.
 
+Images should be 982px wide.
+
 ## Inspiration
 
 https://medium.com/douglas-matoso-english/build-static-site-generator-nodejs-8969ebe34b22

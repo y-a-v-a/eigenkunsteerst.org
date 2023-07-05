@@ -1,17 +1,26 @@
-<meta property="og:site_name" content="Eigen Kunst Eerst"/>
+<meta property="og:site_name" content="Eigen Kunst Eerst" />
 <meta property="og:locale" content="nl_NL" />
 
 <% if(article) { %>
-  <meta property="article:author" content="https://www.facebook.com/vebruijn" />
-  <meta property="og:title" content="<%= article.title %>" />
-  <meta property="og:type" content="article"/>
-  <meta property="og:url" content="<%= article.permaLink %>"/>
-  <meta property="og:image" content="<%= site.baseUrl %>/uploads/assets/<%= article.image %>"/>
+<meta property="article:author" content="https://www.facebook.com/vebruijn" />
+<meta property="og:title" content="<%= article.title %>" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="<%= article.permaLink %>" />
+<meta
+  property="og:image"
+  content="<%= site.baseUrl %>/uploads/assets/<%= article.image %>"
+/>
+<meta property="og:description" content="<%= article.description %>" />
 <% } else { %>
-  <meta property="og:title" content="Eigen Kunst Eerst! &bull; Blog" />
-  <meta property="og:type" content="website"/>
-  <meta property="og:url" content="<%= site.baseUrl %>"/>
-  <meta property="og:image" content="<%= site.baseUrl %>/uploads/assets/<%= site.image %>"/>
+<meta property="og:title" content="Eigen Kunst Eerst! &bull; Blog" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="<%= site.baseUrl %>" />
+<meta
+  property="og:image"
+  content="<%= site.baseUrl %>/uploads/assets/<%= site.image %>"
+/>
+<meta
+  property="og:description"
+  content="Kunstblog - Artikelen in dit blog gaan over beeldende kunst, kijken en cultuur. Kunst en kijken vormen de basis voor recensies en beschouwingen."
+/>
 <% } %>
-
-<meta property="og:description" content="Kunstblog - Artikelen in dit blog gaan over beeldende kunst, hedendaagse kunst, moderne kunst, kijken en cultuur. Kunst en kijken vormen de basis voor recensies en beschouwingen."/>
