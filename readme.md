@@ -15,3 +15,9 @@ https://medium.com/douglas-matoso-english/build-static-site-generator-nodejs-896
 ## License
 
 (c) copyright 2008-2018 Vincent Bruijn <vebruijn@gmail.com>
+
+```sh
+docker build -t eigenkunsteerst:1 .
+
+docker run -id -p 3001:3001 --name eigenkunsteerst -v "$PWD":/usr/src/app eigenkunsteerst:1
+```
