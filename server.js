@@ -1,16 +1,19 @@
-const http = require('http');
-const url = require('url');
-const path = require('path');
-const fs = require('fs');
+import http from 'http';
+import path from 'path';
+import fs from 'fs';
+import debugModule from 'debug';
+
+const debug = debugModule('server');
 const port = process.argv[2] || 3001;
-const debug = require('debug')('server');
 
 http
   .createServer((request, response) => {
-    const uri = url.parse(request.url).pathname;
+    const uri = new URL(request.url, 'http://localhost').pathname;
     let filename = path.join(`${process.cwd()}/build`, uri);
 
-    fs.exists(filename, exists => {
+    fs.access(filename, fs.constants.F_OK, (err) => {
+      const exists = !err;
+      
       if (!exists) {
         response.writeHead(404, { 'Content-Type': 'text/plain' });
         response.write('404 Not Found\n');

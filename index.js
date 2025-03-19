@@ -3,18 +3,20 @@
  * @author  Vincent Bruijn <v@y-a-v-a.org>
  */
 const startTime = Date.now();
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
-const debug = require('debug')('eigenkunsteerst');
-const ejs = require('ejs');
-const fse = require('fs-extra');
-const marked = require('marked');
-const frontMatter = require('front-matter');
-const postcss = require('postcss');
-const cssnano = require('cssnano');
+import debugModule from 'debug';
+import ejs from 'ejs';
+import fse from 'fs-extra';
+import { marked } from 'marked';
+import frontMatter from 'front-matter';
+import postcss from 'postcss';
+import cssnano from 'cssnano';
 
-const config = require('./data/config');
+const config = JSON.parse(fs.readFileSync('./data/config.json', 'utf8'));
+
+const debug = debugModule('eigenkunsteerst');
 
 const fsWriteCallback = (msg) => (error) => {
   if (error) throw error;
@@ -284,7 +286,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
   });
 });
 
-function renderRssFeed(rssItems, data) {
+const renderRssFeed = (rssItems, data) => {
   const rssItemsHTML = [];
   const ejsChannelData = Object.assign({}, data);
 

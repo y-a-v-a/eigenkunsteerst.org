@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Blog of Vincent Bruijn",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "build": "DEBUG=* node index.js",
     "start": "DEBUG=* node server.js"
