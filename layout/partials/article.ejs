@@ -21,10 +21,6 @@
     </div>
     <div class="item-date">
       <time itemtype="dateCreated" datetime="<%= article.date %>"><%= article.dateString %></time>&ensp;
-      <a href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent(article.permaLink) %>"><i class="icon-facebook"></i></a>
-
-      <a href="https://twitter.com/intent/tweet?text=<%= encodeURIComponent(`Ik lees net het artikel '${article.title}' op ${article.permaLink}`) %>&amp;url=<%= encodeURIComponent(article.permaLink) %>&amp;hashtags=eigenkunsteerst" title="Tweet het artikel '<%= article.title %>'"><i class="icon-twitter"></i></a>
-
       <a href="mailto:?to=&amp;subject=<%= article.title %>&amp;body=Ik lees net het artikel '<%= article.title %>' op <%= article.permaLink %>"><i class="icon-mail"></i></a>
     </div>
     <meta itemprop="author" content="Vincent Bruijn">
