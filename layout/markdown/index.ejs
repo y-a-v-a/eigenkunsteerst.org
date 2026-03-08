@@ -4,15 +4,16 @@
 
 ## Recent articles
 
-<% recentArticles.forEach(function(a) { %>* **[<%= a.title %>](/<%= a.yearDir %>/<%= a.mdFileName %>)** - *<%= a.dateString %>*<% if (a.shortDescription) { %>
-  <%- a.shortDescription %><% } %>
+<% recentArticles.forEach(function(a) { -%>
+* **[<%= a.title %>](/<%= a.yearDir %>/<%= a.mdFileName %>)** - *<%= a.dateString %>*<% if (a.shortDescription) { %>: <%- a.shortDescription %><% } %>
 <% }); %>
 
 ---
 
 ## Browse by year
 
-<% navigationItems.forEach(function(item) { %>* **[<%= item.name %>](/<%= item.name %>.md)** - <%= item.articleCount %> article<%= item.articleCount !== 1 ? 's' : '' %>
+<% navigationItems.forEach(function(item) { -%>
+* **[<%= item.name %>](/<%= item.name %>.md)** - <%= item.articleCount %> article<%= item.articleCount !== 1 ? 's' : '' %>
 <% }); %>
 
 ---

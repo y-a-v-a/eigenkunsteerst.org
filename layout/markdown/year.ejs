@@ -4,8 +4,8 @@
 
 ## Articles from <%= yearDir %>
 
-<% articles.forEach(function(a) { %>* **[<%= a.title %>](/<%= a.yearDir %>/<%= a.mdFileName %>)** - *<%= a.dateString %>*<% if (a.shortDescription) { %>
-  <%- a.shortDescription %><% } %>
+<% articles.forEach(function(a) { -%>
+* **[<%= a.title %>](/<%= a.yearDir %>/<%= a.mdFileName %>)** - *<%= a.dateString %>*<% if (a.shortDescription) { %>: <%- a.shortDescription %><% } %>
 <% }); %>
 
 ---
@@ -16,7 +16,8 @@
 
 ### Browse by year
 
-<% navigationItems.forEach(function(item) { %>* **<% if (item.active) { %><%= item.name %> (current)<% } else { %>[<%= item.name %>](/<%= item.name %>.md)<% } %>**
+<% navigationItems.forEach(function(item) { -%>
+* **<% if (item.active) { %><%= item.name %> (current)<% } else { %>[<%= item.name %>](/<%= item.name %>.md)<% } %>**
 <% }); %>
 
 ---

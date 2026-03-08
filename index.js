@@ -116,7 +116,7 @@ fs.readdir(articleSrc, (error, yearDirs) => {
   const rssItems = [];
   let isRssBuilt = false;
 
-  // first pass: collect all article metadata for markdown generation
+  // first pass: collect all article metadata and parsed content
   yearDirs.forEach((yearDir) => {
     const articleSrcYearDir = path.join(articleSrc, yearDir);
     const files = fs.readdirSync(articleSrcYearDir);
@@ -136,19 +136,30 @@ fs.readdir(articleSrc, (error, yearDirs) => {
       );
       const description = pageData.attributes.description || '';
 
+      // truncate at word boundary
+      let shortDescription = description;
+      if (description.length > 120) {
+        shortDescription = description.substring(0, 120);
+        const lastSpace = shortDescription.lastIndexOf(' ');
+        if (lastSpace > 80) {
+          shortDescription = shortDescription.substring(0, lastSpace);
+        }
+        shortDescription += '...';
+      }
+
       allArticles[yearDir].push({
         title: pageData.attributes.title,
         date: pageData.attributes.date,
         dateString,
         image: pageData.attributes.image,
         description,
-        shortDescription: description.length > 120
-          ? description.substring(0, 120) + '...'
-          : description,
+        shortDescription,
         markdownBody: pageData.body,
+        parsedBody: marked.parse(pageData.body, { pedantic: true }),
         mdFileName,
         yearDir,
         file,
+        keywords: pageData.attributes.keywords,
       });
     });
 
@@ -165,176 +176,154 @@ fs.readdir(articleSrc, (error, yearDirs) => {
   // generate markdown pages
   renderMarkdownPages(yearDirs, navigationItems, mostRecentYear);
 
-  // loop over year named directories
-  yearDirs.forEach((yearDir, yearIndex) => {
-    const articleSrcYearDir = path.join(articleSrc, yearDir);
+  // loop over year named directories, reusing parsed data from first pass
+  yearDirs.forEach((yearDir) => {
+    const articles = allArticles[yearDir];
 
     let yearCollection = [];
 
-    // read files from year directory
-    fs.readdir(articleSrcYearDir, (error, files) => {
-      if (error) throw error;
+    debug('Prepare navigation');
+    data.site.navigationItems = navigationItems.map((year) => {
+      let { URL, name } = year;
+      return {
+        URL,
+        name,
+        active: year.name === yearDir,
+      };
+    });
 
-      debug('Prepare navigation');
-      data.site.navigationItems = navigationItems.map((year) => {
-        let { URL, name } = year;
-        return {
-          URL,
-          name,
-          active: year.name === yearDir,
-        };
-      });
+    // process articles using cached parsed data
+    articles.forEach((cached, index) => {
+      // apply some magic to filenames
+      const fileName = cached.file.replace(/ /g, '+').replace('md', 'html');
+      const fileURI = encodeURIComponent(cached.file)
+        .replace(/%20/g, '+')
+        .replace('md', 'html');
 
-      // process markdown files
-      files.forEach((file, index) => {
-        if (file.startsWith('_')) {
-          return;
-        }
-        const articleFileMd = path.join(articleSrcYearDir, file);
+      // populate basic article data object
+      const ejsArticleData = {
+        article: {
+          index,
+          isSingle: true,
+          title: cached.title,
+          pageTitle: `${cached.title} ${config.titleSuffix}`,
+          image: cached.image,
+          imageName: cached.image.replace(/\..*$/, ''),
+          baseUrl: data.site.baseUrl,
+          titleId: `${cached.title}`.replace(/\s+/g, '_'),
+          permaLink: `${data.site.baseUrl}/${yearDir}/${fileURI}`,
+          content: cached.parsedBody,
+          date: cached.date,
+          pubDate: cached.date,
+          dateString: cached.dateString,
+          license: data.channel.license,
+          keywords: cached.keywords || config.metaKeywords,
+          description: cached.description || config.metaDescription,
+        },
+      };
 
-        const articleMd = fs.readFileSync(articleFileMd, 'utf8');
+      // add last 5 articles to rssItems list
+      if (rssItems.length < 5) {
+        rssItems.push({ ...ejsArticleData.article });
+      }
+      if (rssItems.length === 5 && !isRssBuilt) {
+        renderRssFeed(rssItems, data);
+        isRssBuilt = true;
+      }
 
-        // read meta data from markdown document
-        const pageData = frontMatter(articleMd);
+      // process article template
+      ejs.renderFile(
+        './layout/partials/article.ejs',
+        ejsArticleData,
+        {},
+        (error, resultHTML) => {
+          if (error) throw error;
 
-        // render markdown into HTML
-        const rendered = marked.parse(pageData.body, { pedantic: true });
+          const ejsPageData = Object.assign({}, data);
+          ejsPageData.body = resultHTML;
+          ejsPageData.article = ejsArticleData.article;
 
-        // apply some magic to filenames
-        const fileName = file.replace(/ /g, '+').replace('md', 'html');
-        const fileURI = encodeURIComponent(file)
-          .replace(/%20/g, '+')
-          .replace('md', 'html');
+          debug('Rendered article for permaLink');
 
-        // populate basic article data object
-        const ejsArticleData = {
-          article: {
-            index,
-            isSingle: true,
-            title: pageData.attributes.title,
-            pageTitle: `${pageData.attributes.title} ${config.titleSuffix}`,
-            image: pageData.attributes.image,
-            imageName: pageData.attributes.image.replace(/\..*$/, ''),
-            baseUrl: data.site.baseUrl,
-            titleId: `${pageData.attributes.title}`.replace(/\s+/g, '_'),
-            permaLink: `${data.site.baseUrl}/${yearDir}/${fileURI}`,
-            content: rendered,
-            date: pageData.attributes.date,
-            pubDate: pageData.attributes.date,
-            dateString: new Date(pageData.attributes.date).toLocaleString(
-              'nl-NL',
-              DATE_FORMATTER
-            ),
-            license: data.channel.license,
-            keywords: pageData.attributes.keywords || config.metaKeywords,
-            description:
-              pageData.attributes.description || config.metaDescription,
-          },
-        };
+          ejs.renderFile(
+            './layout/master.ejs',
+            ejsPageData,
+            {},
+            (error, pageHTML) => {
+              if (error) throw error;
 
-        // add last 5 articles to rssItems list
-        if (rssItems.length < 5) {
-          rssItems.push({ ...ejsArticleData.article });
-        }
-        if (rssItems.length === 5 && !isRssBuilt) {
-          renderRssFeed(rssItems, data);
-          isRssBuilt = true;
-        }
+              const yearDirName = `${destPath}/${yearDir}`;
 
-        // process article template
-        ejs.renderFile(
-          './layout/partials/article.ejs',
-          ejsArticleData,
-          {},
-          (error, resultHTML) => {
-            if (error) throw error;
-
-            const ejsPageData = Object.assign({}, data);
-            ejsPageData.body = resultHTML;
-            ejsPageData.article = ejsArticleData.article;
-
-            debug('Rendered article for permaLink');
-
-            ejs.renderFile(
-              './layout/master.ejs',
-              ejsPageData,
-              {},
-              (error, pageHTML) => {
-                if (error) throw error;
-
-                const yearDirName = `${destPath}/${yearDir}`;
-
-                fse.mkdirsSync(yearDirName);
-                fs.writeFile(
-                  path.join(yearDirName, fileName),
-                  pageHTML,
-                  fsWriteCallback(`Wrote HTML for ${file}`)
-                );
-              }
-            );
-          }
-        );
-
-        ejsArticleData.article.isSingle = false;
-
-        // process article template for year overview page
-        ejs.renderFile(
-          './layout/partials/article.ejs',
-          ejsArticleData,
-          {},
-          (error, resultHTML) => {
-            if (error) throw error;
-
-            yearCollection.push([
-              ejsArticleData.article.date,
-              resultHTML,
-              ejsArticleData.article.image,
-            ]);
-            debug('Rendered article for year archive');
-          }
-        );
-      });
-
-      if (yearCollection.length) {
-        let ejsPageData = Object.assign({}, data);
-        yearCollection = yearCollection
-          .sort((a, b) => {
-            let dateA = new Date(a[0]).getTime();
-            let dateB = new Date(b[0]).getTime();
-            return dateA > dateB ? 1 : dateA < dateB ? -1 : 0;
-          })
-          .reverse();
-
-        ejsPageData.body = yearCollection.map((el) => el[1]).join('\n');
-        ejsPageData.article = false;
-        let [[, , firstImage]] = yearCollection;
-        ejsPageData.site.image = firstImage;
-
-        ejs.renderFile(
-          './layout/master.ejs',
-          ejsPageData,
-          {},
-          (error, pageHTML) => {
-            if (error) throw error;
-
-            fs.writeFile(
-              path.join(destPath, `${yearDir}.html`),
-              pageHTML,
-              fsWriteCallback(`Wrote HTML for ${yearDir}`)
-            );
-            if (mostRecentYear === yearDir) {
-              const fileName = path.join(destPath, 'index.html');
-
+              fse.mkdirsSync(yearDirName);
               fs.writeFile(
-                fileName,
+                path.join(yearDirName, fileName),
                 pageHTML,
-                fsWriteCallback(`Wrote HTML for index.html`)
+                fsWriteCallback(`Wrote HTML for ${cached.file}`)
               );
             }
-          }
-        );
-      }
+          );
+        }
+      );
+
+      ejsArticleData.article.isSingle = false;
+
+      // process article template for year overview page
+      ejs.renderFile(
+        './layout/partials/article.ejs',
+        ejsArticleData,
+        {},
+        (error, resultHTML) => {
+          if (error) throw error;
+
+          yearCollection.push([
+            ejsArticleData.article.date,
+            resultHTML,
+            ejsArticleData.article.image,
+          ]);
+          debug('Rendered article for year archive');
+        }
+      );
     });
+
+    if (yearCollection.length) {
+      let ejsPageData = Object.assign({}, data);
+      yearCollection = yearCollection
+        .sort((a, b) => {
+          let dateA = new Date(a[0]).getTime();
+          let dateB = new Date(b[0]).getTime();
+          return dateA > dateB ? 1 : dateA < dateB ? -1 : 0;
+        })
+        .reverse();
+
+      ejsPageData.body = yearCollection.map((el) => el[1]).join('\n');
+      ejsPageData.article = false;
+      let [[, , firstImage]] = yearCollection;
+      ejsPageData.site.image = firstImage;
+
+      ejs.renderFile(
+        './layout/master.ejs',
+        ejsPageData,
+        {},
+        (error, pageHTML) => {
+          if (error) throw error;
+
+          fs.writeFile(
+            path.join(destPath, `${yearDir}.html`),
+            pageHTML,
+            fsWriteCallback(`Wrote HTML for ${yearDir}`)
+          );
+          if (mostRecentYear === yearDir) {
+            const fileName = path.join(destPath, 'index.html');
+
+            fs.writeFile(
+              fileName,
+              pageHTML,
+              fsWriteCallback(`Wrote HTML for index.html`)
+            );
+          }
+        }
+      );
+    }
   });
 });
 

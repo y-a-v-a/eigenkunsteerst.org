@@ -4,9 +4,9 @@
 <% if (article.description && article.description !== site.description) { %>
 
 > <%- article.description %>
-<% } %>
-
+<% } -%>
 <% if (article.image) { %>
+
 ![<%= article.title %>](/uploads/assets/<%= article.image %>)
 <% } %>
 
@@ -20,14 +20,16 @@
 
 ### Browse by year
 
-<% navigationItems.forEach(function(item) { %>* **<% if (item.active) { %><%= item.name %> (current)<% } else { %>[<%= item.name %>](/<%= item.name %>.md)<% } %>**
-<% }); %>
+<% navigationItems.forEach(function(item) { -%>
+* **<% if (item.active) { %><%= item.name %> (current)<% } else { %>[<%= item.name %>](/<%= item.name %>.md)<% } %>**
+<% }); -%>
 <% if (yearArticles && yearArticles.length > 0) { %>
 
 ### More from <%= currentYearDir %>
 
-<% yearArticles.forEach(function(a) { %>* <% if (a.title === article.title) { %><%= a.title %> (this article)<% } else { %>**[<%= a.title %>](/<%= a.yearDir %>/<%= a.mdFileName %>)**<% if (a.shortDescription) { %>: <%- a.shortDescription %><% } %><% } %>
-<% }); %>
+<% yearArticles.forEach(function(a) { -%>
+* <% if (a.file === article.file) { %><%= a.title %> (this article)<% } else { %>**[<%= a.title %>](/<%= a.yearDir %>/<%= a.mdFileName %>)**<% if (a.shortDescription) { %>: <%- a.shortDescription %><% } %><% } %>
+<% }); -%>
 <% } %>
 
 ---
