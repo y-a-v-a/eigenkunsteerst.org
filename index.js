@@ -1,5 +1,5 @@
 /**
- * Static site generator generating HTML and XML (for RSS) from markdown articles using ejs templating.
+ * Static site generator generating HTML, XML (for RSS) and Markdown (for LLMs) from markdown articles using ejs templating.
  * @author  Vincent Bruijn <v@y-a-v-a.org>
  */
 const startTime = Date.now();
@@ -85,6 +85,9 @@ postcss(cssnano)
 fse.mkdirsSync(`${destPath}/feeds`);
 debug('Set up some directories');
 
+// collect all article metadata for markdown cross-references
+const allArticles = {};
+
 // read article data dir
 fs.readdir(articleSrc, (error, yearDirs) => {
   if (error) throw error;
@@ -112,6 +115,55 @@ fs.readdir(articleSrc, (error, yearDirs) => {
   let [mostRecentYear] = yearDirs;
   const rssItems = [];
   let isRssBuilt = false;
+
+  // first pass: collect all article metadata for markdown generation
+  yearDirs.forEach((yearDir) => {
+    const articleSrcYearDir = path.join(articleSrc, yearDir);
+    const files = fs.readdirSync(articleSrcYearDir);
+    allArticles[yearDir] = [];
+
+    files.forEach((file) => {
+      if (file.startsWith('_')) return;
+
+      const articleFileMd = path.join(articleSrcYearDir, file);
+      const articleMd = fs.readFileSync(articleFileMd, 'utf8');
+      const pageData = frontMatter(articleMd);
+
+      const mdFileName = file.replace(/ /g, '+');
+      const dateString = new Date(pageData.attributes.date).toLocaleString(
+        'nl-NL',
+        DATE_FORMATTER
+      );
+      const description = pageData.attributes.description || '';
+
+      allArticles[yearDir].push({
+        title: pageData.attributes.title,
+        date: pageData.attributes.date,
+        dateString,
+        image: pageData.attributes.image,
+        description,
+        shortDescription: description.length > 120
+          ? description.substring(0, 120) + '...'
+          : description,
+        markdownBody: pageData.body,
+        mdFileName,
+        yearDir,
+        file,
+      });
+    });
+
+    // sort articles by date descending
+    allArticles[yearDir].sort((a, b) => {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      return dateA > dateB ? -1 : dateA < dateB ? 1 : 0;
+    });
+  });
+
+  debug('Collected all article metadata for markdown generation');
+
+  // generate markdown pages
+  renderMarkdownPages(yearDirs, navigationItems, mostRecentYear);
 
   // loop over year named directories
   yearDirs.forEach((yearDir, yearIndex) => {
@@ -285,6 +337,128 @@ fs.readdir(articleSrc, (error, yearDirs) => {
     });
   });
 });
+
+/**
+ * Generate markdown versions of all pages for LLM-friendly consumption.
+ * Uses the original markdown source directly with EJS templates for navigation.
+ */
+const renderMarkdownPages = (yearDirs, navigationItems, mostRecentYear) => {
+  const plainTitle = config.siteTitle.replace(/&bull;/g, '·');
+
+  const mdSiteData = {
+    plainTitle,
+    description: config.description,
+    copyright: config.copyright,
+    license: config.license,
+  };
+
+  // render individual article markdown pages
+  yearDirs.forEach((yearDir) => {
+    const articles = allArticles[yearDir];
+    const yearDirName = path.join(destPath, yearDir);
+    fse.mkdirsSync(yearDirName);
+
+    const mdNavItems = navigationItems.map((item) => ({
+      name: item.name,
+      active: item.name === yearDir,
+    }));
+
+    articles.forEach((article) => {
+      const ejsData = {
+        article,
+        site: mdSiteData,
+        navigationItems: mdNavItems,
+        yearArticles: articles,
+        currentYearDir: yearDir,
+        mostRecentYear,
+      };
+
+      ejs.renderFile(
+        './layout/markdown/article.ejs',
+        ejsData,
+        {},
+        (error, resultMd) => {
+          if (error) throw error;
+          fs.writeFile(
+            path.join(yearDirName, article.mdFileName),
+            resultMd,
+            fsWriteCallback(`Wrote Markdown for ${article.file}`)
+          );
+        }
+      );
+    });
+  });
+
+  // render year archive markdown pages
+  yearDirs.forEach((yearDir) => {
+    const articles = allArticles[yearDir];
+
+    const mdNavItems = navigationItems.map((item) => ({
+      name: item.name,
+      active: item.name === yearDir,
+    }));
+
+    const ejsData = {
+      yearDir,
+      articles,
+      site: mdSiteData,
+      navigationItems: mdNavItems,
+      mostRecentYear,
+    };
+
+    ejs.renderFile(
+      './layout/markdown/year.ejs',
+      ejsData,
+      {},
+      (error, resultMd) => {
+        if (error) throw error;
+        fs.writeFile(
+          path.join(destPath, `${yearDir}.md`),
+          resultMd,
+          fsWriteCallback(`Wrote Markdown for ${yearDir}`)
+        );
+      }
+    );
+  });
+
+  // render index.md with recent articles across all years
+  const recentArticles = yearDirs
+    .flatMap((yearDir) => allArticles[yearDir])
+    .sort((a, b) => {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      return dateA > dateB ? -1 : dateA < dateB ? 1 : 0;
+    })
+    .slice(0, 10);
+
+  const mdNavWithCounts = navigationItems.map((item) => ({
+    name: item.name,
+    articleCount: (allArticles[item.name] || []).length,
+  }));
+
+  const ejsData = {
+    site: mdSiteData,
+    navigationItems: mdNavWithCounts,
+    recentArticles,
+    mostRecentYear,
+  };
+
+  ejs.renderFile(
+    './layout/markdown/index.ejs',
+    ejsData,
+    {},
+    (error, resultMd) => {
+      if (error) throw error;
+      fs.writeFile(
+        path.join(destPath, 'index.md'),
+        resultMd,
+        fsWriteCallback('Wrote Markdown for index.md')
+      );
+    }
+  );
+
+  debug('Generated all markdown pages');
+};
 
 const renderRssFeed = (rssItems, data) => {
   const rssItemsHTML = [];

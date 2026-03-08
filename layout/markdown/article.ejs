@@ -1,0 +1,35 @@
+# <%= article.title %>
+
+*<%= article.dateString %>*
+<% if (article.description && article.description !== site.description) { %>
+
+> <%- article.description %>
+<% } %>
+
+<% if (article.image) { %>
+![<%= article.title %>](/uploads/assets/<%= article.image %>)
+<% } %>
+
+<%- article.markdownBody %>
+
+---
+
+## Navigation
+
+**[<%= site.plainTitle %>](/<%= mostRecentYear %>.md)** | [RSS](/feeds/rss.xml)
+
+### Browse by year
+
+<% navigationItems.forEach(function(item) { %>* **<% if (item.active) { %><%= item.name %> (current)<% } else { %>[<%= item.name %>](/<%= item.name %>.md)<% } %>**
+<% }); %>
+<% if (yearArticles && yearArticles.length > 0) { %>
+
+### More from <%= currentYearDir %>
+
+<% yearArticles.forEach(function(a) { %>* <% if (a.title === article.title) { %><%= a.title %> (this article)<% } else { %>**[<%= a.title %>](/<%= a.yearDir %>/<%= a.mdFileName %>)**<% if (a.shortDescription) { %>: <%- a.shortDescription %><% } %><% } %>
+<% }); %>
+<% } %>
+
+---
+
+*<%= site.copyright %>* | [Creative Commons BY-NC-SA 3.0](<%= site.license %>)

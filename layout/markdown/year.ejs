@@ -1,0 +1,24 @@
+# <%= site.plainTitle %> - <%= yearDir %>
+
+<%= site.description %>
+
+## Articles from <%= yearDir %>
+
+<% articles.forEach(function(a) { %>* **[<%= a.title %>](/<%= a.yearDir %>/<%= a.mdFileName %>)** - *<%= a.dateString %>*<% if (a.shortDescription) { %>
+  <%- a.shortDescription %><% } %>
+<% }); %>
+
+---
+
+## Navigation
+
+**[<%= site.plainTitle %>](/<%= mostRecentYear %>.md)** | [RSS](/feeds/rss.xml)
+
+### Browse by year
+
+<% navigationItems.forEach(function(item) { %>* **<% if (item.active) { %><%= item.name %> (current)<% } else { %>[<%= item.name %>](/<%= item.name %>.md)<% } %>**
+<% }); %>
+
+---
+
+*<%= site.copyright %>* | [Creative Commons BY-NC-SA 3.0](<%= site.license %>)
