@@ -242,6 +242,9 @@ fs.readdir(articleSrc, (error, yearDirs) => {
           const ejsPageData = Object.assign({}, data);
           ejsPageData.body = resultHTML;
           ejsPageData.article = ejsArticleData.article;
+          ejsPageData.site = Object.assign({}, data.site, {
+            markdownUrl: `/${yearDir}/${cached.mdFileName}`,
+          });
 
           debug('Rendered article for permaLink');
 
@@ -298,7 +301,10 @@ fs.readdir(articleSrc, (error, yearDirs) => {
       ejsPageData.body = yearCollection.map((el) => el[1]).join('\n');
       ejsPageData.article = false;
       let [[, , firstImage]] = yearCollection;
-      ejsPageData.site.image = firstImage;
+      ejsPageData.site = Object.assign({}, data.site, {
+        image: firstImage,
+        markdownUrl: `/${yearDir}.md`,
+      });
 
       ejs.renderFile(
         './layout/master.ejs',
@@ -313,12 +319,23 @@ fs.readdir(articleSrc, (error, yearDirs) => {
             fsWriteCallback(`Wrote HTML for ${yearDir}`)
           );
           if (mostRecentYear === yearDir) {
-            const fileName = path.join(destPath, 'index.html');
+            // render index.html separately with its own markdown URL
+            ejsPageData.site = Object.assign({}, ejsPageData.site, {
+              markdownUrl: '/index.md',
+            });
 
-            fs.writeFile(
-              fileName,
-              pageHTML,
-              fsWriteCallback(`Wrote HTML for index.html`)
+            ejs.renderFile(
+              './layout/master.ejs',
+              ejsPageData,
+              {},
+              (error, indexHTML) => {
+                if (error) throw error;
+                fs.writeFile(
+                  path.join(destPath, 'index.html'),
+                  indexHTML,
+                  fsWriteCallback(`Wrote HTML for index.html`)
+                );
+              }
             );
           }
         }

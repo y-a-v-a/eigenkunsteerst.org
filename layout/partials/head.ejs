@@ -23,6 +23,9 @@
   <meta name="keywords" content="<%- article ? article.keywords : site.keywords %>" />
   <meta name="language" content="nl" />
   <link rel="alternate" type="application/rss+xml" title="Eigen Kunst Eerst! &bull; RSS" href="<%= site.baseUrl %>/feeds/rss.xml" />
+  <% if(site.markdownUrl) { %>
+  <link rel="alternate" type="text/markdown" title="Markdown version" href="<%= site.markdownUrl %>" />
+  <% } %>
 
   <%- include('og') %>
 
